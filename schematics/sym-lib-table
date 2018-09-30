@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name motor_3pole)(type Legacy)(uri E:/home/automation/heating/cpu/motor_3pole.lib)(options "")(descr ""))
+)
