@@ -1,25 +1,27 @@
 ## General
 
-Live setup uses Olimex A20 Micro board, should be suitable for other boards with Linux where you have
+Live setup uses Olimex linuxino A20 micro board, should be suitable for other boards with Linux where you have
 GPIO and I2C access.
 
 ## What's inside
 
-# heating
+### heating
 
 sources for 'heating' binary. It takes boardConfig.json, periodically polls for weather.json and 
 controls hardware
 
-# roomDrawing
+### roomDrawing
 
 drawing of boiler room hardware
 
-# schematics 
+### schematics 
 
-2 boards interfacing Olimex to motors, valves and sensors. One (left) is logic-level only and serves
-connecting bunch of ds18b20 sensors via ds2482 bridge. The other (right) is relay and feedback board.
+KiCad projects with 2 boards (same page) interfacing Olimex board to motors, valves and sensors. 
+One (left) is logic-level only and serves connecting bunch of ds18b20 sensors via ds2482 bridge;
+it also contains 2 darlington arrays ULN2003 connecting 3.3V GPIO to 5V relays.
+The other (right) is relay and feedback board.
 
-# boardCfg
+### boardCfg
 
 fex file for enabling PE port GPIO on Olimex A20 Micro (google for A20-GPIO.pdf for more) 
 
