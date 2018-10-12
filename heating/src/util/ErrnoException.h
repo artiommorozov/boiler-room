@@ -1,5 +1,4 @@
-#ifndef errno_exception_h_included
-#define errno_exception_h_included
+#pragma once
 
 #include <string>
 #include <stdexcept>
@@ -21,5 +20,3 @@ public:
 
 	}
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _1wire_h_included
-#define _1wire_h_included
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -94,4 +93,3 @@ namespace OneWire
 	}
 }
 
-#endif

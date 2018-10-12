@@ -1,0 +1,72 @@
+{
+  "ds2482": {
+    "port": "/dev/i2c-0",
+    "address": 24
+  },
+
+  "gpio": {
+    "export": [ 1, 2, 3 ],
+
+    "motorTempUp": "motorTempUp",
+    "motorTempDown": "motorTempDown",
+    "motorCloseBoiler": "motorCloseBoiler",
+    "motorOpenBoiler": "motorOpenBoiler",
+    "furnace": "furnace",
+    "furnacePump": "furnacePump",
+    "furnaceValve": "furnaceValve",
+    "boilerValve": "boilerValve",
+    "circulationPump": "circulationPump",
+    "radiatorPump":  "radiatorPump",
+    "tempMotorSense": "tempMotorSense",
+    "boilerSense": "boilerSense"
+  },
+
+  "tempSensors": {
+    "room": "idroom",
+
+    "furnace": {
+      "outA": "idfurnoutA",
+      "outB": "idfurnoutB",
+      "return": "idfurnret"
+    },
+
+    "mix": {
+      "out": "idmixout",
+      "reservoir": "idmixres",
+      "return": "idmixret"
+    },
+
+    "reservoir": "idres",
+
+    "radiators": {
+      "returnA": "idradreta",
+      "returnB": "idradretb"
+    }
+  },
+
+  "maxTemp": {
+    "furnaceOut": 75,
+    "furnaceOutDiff": 2,
+    "furnaceOutReturnDiff": 17,
+    "reservoirBottom": 65
+  },
+
+  "valves": {
+    "fullTurnSec": 12
+  },
+
+  "delay": {
+    "boilerHeatMin": 2,
+    "furnacePumpRunoutMin": 3,
+    "circulationPumpIdleMin": 120,
+    "circulationPumpRunMin": 3
+  },
+
+  "mixTemp": {
+    "-33": 70,
+    "-21": 60,
+    "-10": 50,
+    "2": 38
+  }
+}
+

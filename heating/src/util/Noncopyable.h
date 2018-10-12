@@ -1,5 +1,4 @@
-#ifndef noncopyable_h_included
-#define noncopyable_h_included
+#pragma once
 
 struct Noncopyable
 {
@@ -8,4 +7,3 @@ struct Noncopyable
 	Noncopyable(const Noncopyable&) = delete;
 };
 
-#endif

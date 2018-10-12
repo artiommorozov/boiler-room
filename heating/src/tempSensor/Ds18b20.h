@@ -1,5 +1,4 @@
-#ifndef ds18b20_h_included
-#define ds18b20_h_included
+#pragma once
 
 namespace Ds18b20
 {
@@ -44,4 +43,3 @@ namespace Ds18b20
 	}
 }
 
-#endif

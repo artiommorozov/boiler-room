@@ -1,5 +1,4 @@
-#ifndef temp_sensor_h_included
-#define temp_sensor_h_included
+#pragma once
 
 #include "tempSensor/1wire.h"
 #include <vector>
@@ -19,6 +18,6 @@ namespace Temp
 	};
 
 	std::vector< std::shared_ptr< ISensor > > openAllDs2482_800(const std::string &i2c_device, int i2c_address);
+	std::vector< int > bulkRead(const std::vector< std::shared_ptr< ISensor > > &src);
 }
 
-#endif

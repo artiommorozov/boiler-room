@@ -1,5 +1,4 @@
-#ifndef wait_cycle_h_included
-#define wait_cycle_h_included
+#pragma once
 
 #include <unistd.h>
 
@@ -23,4 +22,3 @@ struct PeriodicCheckWait
 	}
 };
 
-#endif

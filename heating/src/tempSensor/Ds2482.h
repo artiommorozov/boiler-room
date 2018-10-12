@@ -1,5 +1,4 @@
-#ifndef ds2482_h_included
-#define ds2482_h_included
+#pragma once
 
 #include "util/Noncopyable.h"
 #include "util/ErrnoException.h"
@@ -333,4 +332,3 @@ namespace Ds2482
 
 }
 
-#endif

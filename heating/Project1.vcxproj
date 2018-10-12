@@ -90,14 +90,23 @@
     <ClCompile Include="src\util\Hexstr.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\config\Config.h" />
+    <ClInclude Include="src\control\Control.h" />
+    <ClInclude Include="src\control\Mixer.h" />
+    <ClInclude Include="src\control\PotCirculation.h" />
+    <ClInclude Include="src\control\Temperature.h" />
+    <ClInclude Include="src\gpio\Gpio.h" />
     <ClInclude Include="src\tempSensor\1wire.h" />
     <ClInclude Include="src\tempSensor\Ds18b20.h" />
     <ClInclude Include="src\tempSensor\Ds2482.h" />
     <ClInclude Include="src\tempSensor\TempSensor.h" />
+    <ClInclude Include="src\util\clamp.h" />
     <ClInclude Include="src\util\dbglog.h" />
     <ClInclude Include="src\util\ErrnoException.h" />
     <ClInclude Include="src\util\Hexstr.h" />
+    <ClInclude Include="src\util\log.h" />
     <ClInclude Include="src\util\Noncopyable.h" />
+    <ClInclude Include="src\util\Timer.h" />
     <ClInclude Include="src\util\WaitCycle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
