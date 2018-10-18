@@ -5,7 +5,7 @@ SSH=$(OPENSSH)\ssh.exe
 include board.mak
 
 all:
-	$(SCP) -Br src $(BOARD_USER)@/$(BOARD_IP)/:/home/$(BOARD_USER)/
-	$(SCP) -B Makefile $(BOARD_USER)@/$(BOARD_IP)/:/home/$(BOARD_USER)/
-	$(SSH) $(BOARD_USER)@/$(BOARD_IP)/ make
+	$(SCP) -Br src $(BOARD_USER)@$(BOARD_IP):/home/$(BOARD_USER)/
+	$(SCP) -B Makefile $(BOARD_USER)@$(BOARD_IP):/home/$(BOARD_USER)/
+	$(SSH) $(BOARD_USER)@$(BOARD_IP) make
                                                                  

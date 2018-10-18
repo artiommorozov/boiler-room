@@ -22,13 +22,35 @@
 
 using namespace Heat;
 
+int dumpTemp(const char *device, const char *port)
+{
+	try
+	{
+		for (auto i : Temp::openAllDs2482_800(device, strtol(port, nullptr, 16)))
+		{
+			auto id = i->id();
+			std::cout << "sensor " << id.toString() << " reads=" << i->read() << "\n";
+		}
+	}
+	catch (const std::exception &e)
+	{
+		std::cout << "*** ERROR: " << e.what() << "\n";
+	}
+
+	return 0;
+}
+
+
 int main(int argc, const char **argv)
 {
 	if (argc < 3)
 	{
-		printf("Use %s <config.json> <userCfg.json>\n", argv[0]);
+		printf("Use %s <config.json> <userCfg.json>\nor %s --temp ds2482_i2c_device ds2482_port_hex\n", argv[0], argv[0]);
 		return -1;
 	}
+
+	if (argc > 3 && !strcmp(argv[1], "--temp"))
+		return dumpTemp(argv[2], argv[3]);
 
 	try
 	{
@@ -64,7 +86,7 @@ int main(int argc, const char **argv)
 	}
 	catch (const std::exception& e)
 	{
-		printf("error: %s\n", e.what());
+		std::cout << "*** ERROR: " << e.what() << "\n";
 	}
 	
     return 0;

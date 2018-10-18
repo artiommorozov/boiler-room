@@ -1,11 +1,18 @@
 #pragma once
 
+#include <time.h>
+
 class Timer
 {
-	bool _set = false;
-	struct timespec _time = { 0, 0 };
-
+	struct timespec _time;
+	bool _set;
 public:
+
+	Timer()
+		: _time{ 0, 0 }, _set(false)
+	{
+	}
+
 	bool expired() 
 	{
 		if (!_set)

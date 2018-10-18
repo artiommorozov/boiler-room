@@ -98,6 +98,7 @@
     <ClInclude Include="src\gpio\Gpio.h" />
     <ClInclude Include="src\tempSensor\1wire.h" />
     <ClInclude Include="src\tempSensor\Ds18b20.h" />
+    <ClInclude Include="src\tempSensor\Ds18s20.h" />
     <ClInclude Include="src\tempSensor\Ds2482.h" />
     <ClInclude Include="src\tempSensor\TempSensor.h" />
     <ClInclude Include="src\util\clamp.h" />
@@ -108,6 +109,9 @@
     <ClInclude Include="src\util\Noncopyable.h" />
     <ClInclude Include="src\util\Timer.h" />
     <ClInclude Include="src\util\WaitCycle.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

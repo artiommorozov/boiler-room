@@ -1,13 +1,16 @@
 #pragma once
 
+#include <time.h>
+#include <sstream>
+
 void log(const std::string &msg)
 {
-	using namespace boost::posix_time;
-
-	ptime now(second_clock::local_time());
+	time_t t = time(NULL);
+	char buf[0xff];
+	ctime_r(&t, buf);
 
 	std::stringstream out;
 
-	out << to_simple_string(now) << ": " << msg << "\n";
+	out << ((const char*) buf) << ": " << msg << "\n";
 	std::cout << out.str();
 }

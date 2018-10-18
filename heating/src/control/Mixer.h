@@ -1,5 +1,11 @@
 #pragma once
 
+#include <mutex>
+#include <thread>
+#include <atomic>
+
+#include "util/clamp.h"
+
 namespace Heat
 {
 	class MixTempApprox
@@ -14,7 +20,7 @@ namespace Heat
 			for (const auto &i : cfg.mixTemp)
 				newTemps.push_back(std::make_pair(i.first, i.second));
 
-			std::sort(newTemps.begin(), newTemps.end(), [](auto &a, auto &b)
+			std::sort(newTemps.begin(), newTemps.end(), [](const std::pair< int, int > &a, const std::pair< int, int > &b)
 				{
 					return a.first < b.first;
 				});
@@ -94,29 +100,30 @@ namespace Heat
 	class Mixer
 	{
 		std::unique_ptr< std::thread > _thread;
-		std::atomic_bool _needsHeat = false, _quit = false;
-		std::atomic_int _insideExpectedTemp = 21, _insideActualTemp = 21, _outsideTemp = 21,
-			_mixInHotTemp = 0, _mixInColdTemp = 0, _mixResultTemp = 0;
+		std::atomic_bool _needsHeat, _quit;
+		std::atomic_int _insideExpectedTemp, _insideActualTemp, _outsideTemp,
+			_mixInHotTemp, _mixInColdTemp, _mixResultTemp;
 
 		enum class MixPos : int
 		{
 			Max,
 			Min, 
 			Med
-		} _mixPos = MixPos::Med;
+		} _mixPos;
 
 		struct MixSettings
 		{
-			int outsideTemp = 0;
-			int mixOut = 0;
-			std::string updateLog{ "" };
+			int mixOut;
+			int outsideTemp;
+			std::string updateLog;
 
 			MixSettings()
+				: mixOut(0), outsideTemp(0)
 			{
 			}
 
 			MixSettings(int outside, const std::shared_ptr<MixTempApprox> &tempApprox)
-				: outsideTemp(outside)
+				: mixOut(0), outsideTemp(outside)
 			{
 				mixOut = tempApprox->getMixTemp(outside, &updateLog);
 			}
@@ -213,12 +220,16 @@ namespace Heat
 
 			double halfTurnATime = (double) diff / 2;
 
-			_valvePos.adjustBy(std::clamp(diff / totalWidth, -1.0, 1.0), gpio);
+			_valvePos.adjustBy(std::clamp(halfTurnATime / totalWidth, -1.0, 1.0), gpio);
 		}
 
 	public:
 		Mixer(Config &cfg, Gpio &gpio)
-			: _valvePos(gpio, cfg)
+			: _needsHeat(false), _quit(false),
+			_insideExpectedTemp(21), _insideActualTemp(21), _outsideTemp(21),
+			_mixInHotTemp(0), _mixInColdTemp(0), _mixResultTemp(0),
+			_mixPos(MixPos::Med),
+			_valvePos(gpio, cfg)
 		{
 			std::shared_ptr< MixTempApprox > tempApprox(new MixTempApprox(cfg));
 

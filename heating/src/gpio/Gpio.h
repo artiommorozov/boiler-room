@@ -1,5 +1,7 @@
 #pragma once
 
+#include "boost/noncopyable.hpp"
+
 static const char *gpioRoot = "/sys/class/gpio/";
 
 class GpioPin : boost::noncopyable
@@ -41,8 +43,8 @@ public:
 		: GpioPin(pinDir, "in"),
 		_f(pinDir + "/value")
 	{
-		auto k = _f.good();
-		int z = 1;
+		if (!_f.good())
+			throw std::runtime_error(pinDir + "/value: failed to read");
 	}
 
 	bool isLow()
@@ -114,11 +116,12 @@ class Gpio : boost::noncopyable
 
 	std::unique_ptr< GpioInPin > _tempMotorSense, _boilerSense;
 
-	bool _furnaceOn = false;
-	bool _resLineClosed = false;
+	bool _furnaceOn;
+	bool _resLineClosed;
 
 public:
 	explicit Gpio(const Config &cfg)
+		: _furnaceOn(false), _resLineClosed(false)
 	{
 		for (int x : cfg.gpioExports)
 			_export(x);

@@ -80,12 +80,12 @@ namespace Heat
 				for (size_t j = 0; j < values.size(); ++j)
 					values[j] = src[j][i];
 
-				std::sort(values.begin(), values.end(), [](auto a, auto b) { return b < a; });
+				std::sort(values.begin(), values.end(), [](int a, int b) { return b < a; });
 
 				size_t goodFrom = 0, goodUntil = 1;
 
-				constexpr size_t maxTempDelta = 2;
-				constexpr int minMatchingReadings = 3;
+				constexpr int maxTempDelta = 2;
+				constexpr size_t minMatchingReadings = 3;
 
 				for (size_t j = 1; j < values.size(); ++j)
 					if (values[j - 1] - values[j] >= maxTempDelta)

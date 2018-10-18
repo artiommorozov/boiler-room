@@ -17,7 +17,7 @@ namespace Heat
 			BoilerStartPump,
 			BoilerHeating,
 			BoilerStop
-		} _state = State::ResHot;
+		} _state;
 
 		Timer _valveTimer, _pumpTimer, _boilerHeat;
 		Mixer _mixer;
@@ -188,7 +188,7 @@ namespace Heat
 	public:
 
 		Control(Gpio &gpio, Config &cfg)
-			: _mixer(cfg, gpio)
+			: _state(State::ResHot), _mixer(cfg, gpio)
 		{
 		}
 

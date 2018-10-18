@@ -1,5 +1,6 @@
 #include "tempSensor/TempSensor.h"
 #include "tempSensor/Ds18b20.h"
+#include "tempSensor/Ds18s20.h"
 #include "tempSensor/Ds2482.h"
 #include "tempSensor/1wire.h"
 #include "util/WaitCycle.h"
@@ -15,7 +16,7 @@ typedef Ds2482::Port< Interface > Port;
 
 struct LineBulkQuery
 {
-	std::vector< OneWire::Rom > ids;
+	std::vector< std::shared_ptr< ISensor > > sensors;
 	Port *port;
 };
 
@@ -28,11 +29,11 @@ protected:
 	static std::map<Ds2482::AdapterPort, LineBulkQuery> groupByLine(const std::vector< std::shared_ptr< ISensor > > &sensors)
 	{
 		std::map<Ds2482::AdapterPort, LineBulkQuery> perLine;
-		for (auto i : sensors)
+		for (auto &i : sensors)
 		{
 			Sensor *s = (Sensor*)i.get();
 			auto group = perLine[s->_port.index()];
-			group.ids.push_back(s->id());
+			group.sensors.push_back(i);
 			group.port = &s->_port;
 		}
 
@@ -48,19 +49,34 @@ protected:
 			OneWire::session(port, std::string("waiting for conversion to finish"))
 				.perform([](Port &p) { p.waitReadOne(); });
 
-			for (auto id : lineSensors.second.ids)
-				OneWire::session(port, std::string("reading temp value of ") + id.toString())
-					.perform([&](Port &p) { readings[id] = Ds18b20::readTempFromScratchpad(p, id); });
+			for (auto &sensor : lineSensors.second.sensors)
+			{
+				const OneWire::Rom &id = sensor->id();
+				OneWire::session(port, std::string("reading temp value of ") + sensor->id().toString())
+					.perform([&](Port &p) { readings[id] = ((Sensor*)sensor.get())->_readScratchpad(port, id); });
+			}
 		}
 
 		return readings;
 	}
 
+	std::function< int(Port &, const OneWire::Rom &) > _readScratchpad;
+
 public:
 	Sensor(const std::shared_ptr< Interface > &chipInterface, Ds2482::AdapterPort line, const OneWire::Rom &id)
-		: _id(id), _port(chipInterface, line)
+		: _id(id), _port(chipInterface, line),
+		_readScratchpad(Ds18b20::readTempFromScratchpad<Port>)
 	{
+		switch (Ds18s20::type(_port, id))
+		{
+		case Ds1820Type::SType: _readScratchpad = Ds18s20::readTempFromScratchpad<Port>; break;
 
+		case Ds1820Type::BType: break;
+
+		case Ds1820Type::Unknown:
+		default:
+		 throw new std::runtime_error(std::string("Unknown sensor type for id=") + id.toString());
+		}
 	}
 
 	int read()
@@ -68,7 +84,7 @@ public:
 		int ret;
 		OneWire::session(_port, "reading temp from " + _id.toString())
 			.perform(
-				[&ret, this](Port &port) { ret = Ds18b20::convertAndReadTemp(port, this->_id); });
+				[&ret, this](Port &port) { ret = Ds18b20::convertAndReadTemp(port, this->_id, this->_readScratchpad); });
 
 		return ret;
 	}

@@ -31,15 +31,15 @@ namespace Ds18b20
 		return ret;
 	}
 
-	template< typename Port >
-	int convertAndReadTemp(Port &port, const OneWire::Rom &id)
+	template< typename Port, typename ReadScratchpad >
+	int convertAndReadTemp(Port &port, const OneWire::Rom &id, ReadScratchpad &readScratchpad)
 	{
 		port.matchRom(id);
 		port.sendByte(Ds18b20::Cmds::convert);
 		port.waitReadOne();
 
 		port.reset();
-		return readTempFromScratchpad(port, id);
+		return readScratchpad(port, id);
 	}
 }
 

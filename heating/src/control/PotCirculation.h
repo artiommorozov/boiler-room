@@ -8,11 +8,17 @@ namespace Heat
 		{
 			Off,
 			On
-		} _state = State::Off;
+		} _state;
 
 		Timer _timer;
 
 	public:
+
+		Circulation()
+			: _state(State::Off)
+		{
+
+		}
 
 		void tick(Gpio &gpio, Config &cfg)
 		{

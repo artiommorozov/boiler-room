@@ -1,9 +1,17 @@
 #pragma once
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/filesystem.hpp>
+
+#ifndef _WIN32
+#define override
+#endif
+
 struct JsonConfig
 {
 	std::string _filename;
-	std::time_t	_lastWrite;
+	time_t	_lastWrite;
 
 	explicit JsonConfig(const std::string &filename)
 		: _filename(filename)
@@ -39,13 +47,11 @@ struct JsonConfig
 
 struct UserParams : public JsonConfig
 {
-	int requiredTempInside = 22;
-	int externalTemp = 22;
-
-	using JsonConfig::JsonConfig;
+	int requiredTempInside;
+	int externalTemp;
 
 	explicit UserParams(const std::string &filename)
-		: JsonConfig(filename)
+		: JsonConfig(filename), requiredTempInside(22), externalTemp(22)
 	{
 		refresh();
 	}
