@@ -9,6 +9,8 @@
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
+#include <bitset>
+#include <list>
 
 namespace Ds2482
 {
@@ -207,7 +209,7 @@ namespace Ds2482
 			waitReady();
 		}
 
-		unsigned char oneWireTriplet(unsigned char directionTo1)
+		unsigned char oneWireTriplet(bool directionTo1)
 		{
 			waitReady();
 
@@ -236,6 +238,16 @@ namespace Ds2482
 
 	const unsigned char requestChannelByte[] = { 0xf0, 0xe1, 0xd2, 0xc3, 0xb4, 0xa5, 0x96, 0x87 };
 	const unsigned char responseChannelByte[] = { 0xb8, 0xb1, 0xaa, 0xa3, 0x9c, 0x95, 0x8e, 0x87 };
+
+	template<typename T>
+	bool hasFurtherBits(const T &set, size_t from)
+	{
+		for (size_t k = from + 1; k < set.size(); ++k)
+			if (set[k])
+				return true;
+
+		return false;
+	}
 
 	template< typename Interface >
 	class Port : Noncopyable
@@ -293,36 +305,40 @@ namespace Ds2482
 		}
 
 		std::vector< OneWire::Rom > searchRom()
-		{
+		{		
+			std::list< std::bitset<64> > search(1);
 			std::vector< OneWire::Rom > ret;
 
-			for (int startFrom = -1, finished = 0, discrepancyFound = 1; !finished && discrepancyFound; )
+			for (std::list< std::bitset<64> >::iterator i = search.begin(); i != search.end(); ++i)
 			{
 				OneWire::Rom current = { { 0 } };
+				_adapter->resetAndCheckPresence();
 				_adapter->oneWireWriteByte(OneWire::Commands::searchRom);
-				discrepancyFound = 0;
 
-				for (int i = 0; i < 64; ++i)
+				for (size_t j = 0; j < 64; ++j)
 				{
-					unsigned char status = _adapter->oneWireTriplet(i <= startFrom ? 1 : 0);
+					unsigned char status = _adapter->oneWireTriplet(i->test(j));
 					auto bit1 = status & StatusRegister::SingleBitResult;
 					auto bit2 = status & StatusRegister::TripletSecondBit;
 
 					if (bit1 && bit2)
-						finished = 1;
+						break;
 
-					else if (bit1)
-						current.value[i / 8] |= 1 << (i % 8);
+					else if (bit2)
+						continue;
 
-					else if (!bit2 && startFrom < i && !discrepancyFound)
+					else if (!bit1 && !i->test(j))
 					{
-						startFrom = i;
-						discrepancyFound = 1;
+						if (!hasFurtherBits(*i, j))
+							search.push_back(std::bitset<64>(*i).set(j));
+						
+						continue;
 					}
+
+					current.value[j / 8] |= 1 << (j % 8);
 				}
 
-				if (!finished)
-					ret.push_back(current);
+				ret.push_back(current);
 			}
 
 			return ret;

@@ -23,7 +23,7 @@ namespace Ds18b20
 		unsigned char low = port.readByte();
 		unsigned char high = port.readByte();
 
-		int ret = (low >> 4) + ((high & 7) << 4);
+		int ret = (low >> 4) + ((high & 7) << 4) + ((low & 8) ? 1 : 0);
 
 		if (high & ~7)
 			ret = -ret;

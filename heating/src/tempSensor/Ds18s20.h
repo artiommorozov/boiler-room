@@ -38,6 +38,7 @@ namespace Ds18s20
 		port.readByte();
 		port.readByte();
 		port.readByte();
+		port.readByte();
 
 		unsigned char reserved = port.readByte();
 		if (reserved == (unsigned char) 0xff)	

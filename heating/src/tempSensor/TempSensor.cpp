@@ -67,7 +67,12 @@ public:
 		: _id(id), _port(chipInterface, line),
 		_readScratchpad(Ds18b20::readTempFromScratchpad<Port>)
 	{
-		switch (Ds18s20::type(_port, id))
+		Ds1820Type type;
+		OneWire::session(_port, "checking sensor type " + _id.toString())
+			.perform(
+				[&type, this](Port &port) { type = Ds18s20::type(port, this->_id); });
+
+		switch (type)
 		{
 		case Ds1820Type::SType: _readScratchpad = Ds18s20::readTempFromScratchpad<Port>; break;
 
@@ -75,7 +80,7 @@ public:
 
 		case Ds1820Type::Unknown:
 		default:
-		 throw new std::runtime_error(std::string("Unknown sensor type for id=") + id.toString());
+		 throw std::runtime_error(std::string("Unknown sensor type for id=") + id.toString());
 		}
 	}
 
@@ -121,7 +126,7 @@ namespace Temp
 		std::vector< std::shared_ptr< ISensor > > ret;
 
 		for (auto line : Ds2482::ds2482_800Ports)
-			try
+		try
 		{
 			std::vector< OneWire::Rom > lineIds;
 			Port port(ds2482, line);
@@ -131,7 +136,10 @@ namespace Temp
 					[&](Port &p)
 					{
 						for (auto id : p.searchRom())
+						{
+						//	std::cout << " on line " << line << " found id " << id.toString() << "\n";
 							ret.push_back(std::shared_ptr<ISensor>(new Sensor(ds2482, line, id)));
+						}
 					});
 		}
 		catch (const std::exception &e)
