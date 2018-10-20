@@ -135,6 +135,7 @@ namespace Heat
 			try
 			{
 				_readings = _join({ a, b, c, d });
+				logTemp(dumpReadings());
 			}
 			catch (const std::exception &e)
 			{
@@ -144,15 +145,15 @@ namespace Heat
 			return *this;
 		}
 
-		void dumpReadings()
+		std::string dumpReadings()
 		{
 			std::stringstream out;
 
-			out << "Temp readings: ";
+			out << "";
 			for (size_t i = 0; i < _readings.size(); ++i)
-				out << _sensors[i]->id().toString() << " " << _readings[i] << "\n";
+				out << _sensors[i]->id().toString() << "," << _readings[i] << ",";
 
-			log(out.str());
+			return out.str();
 		}
 
 		bool furnaceHot() const

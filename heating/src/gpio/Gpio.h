@@ -49,10 +49,8 @@ public:
 
 	bool isLow()
 	{
-		// TODO: check on LINUX!
-#ifdef GPIO_STUB
 		_f.seekg(0);
-#endif
+
 		std::string v;
 		std::getline(_f, v);
 		if (v == "1")
@@ -87,6 +85,7 @@ public:
 		bool ret = !_low;
 
 		_f << "0\n";
+		_f.flush();
 		_low = true;
 
 		return ret;
@@ -97,6 +96,7 @@ public:
 		bool ret = _low;
 
 		_f << "1\n";
+		_f.flush();
 		_low = false;
 
 		return ret;

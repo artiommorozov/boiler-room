@@ -22,10 +22,25 @@ namespace Ds18b20
 
 		unsigned char low = port.readByte();
 		unsigned char high = port.readByte();
+		port.readByte();
+		port.readByte();
+		unsigned char cfg = port.readByte();
 
-		int ret = (low >> 4) + ((high & 7) << 4) + ((low & 8) ? 1 : 0);
+		int ret;
+		const int res9bit = 0, res10bit = 1, res11bit = 2, res12bit = 3;
 
-		if (high & ~7)
+		switch ((cfg >> 5) & 0x3)
+		{
+		case res9bit: ret = (low >> 1) + ((low & 1) ? 1 : 0); break;
+
+		case res10bit: ret = (low >> 2) + ((high & 1) << 6) + ((low & 2) ? 1 : 0); break;
+
+		case res11bit: ret = (low >> 3) + ((high & 3) << 5) + ((low & 4) ? 1 : 0); break;
+
+		case res12bit: ret = (low >> 4) + ((high & 7) << 4) + ((low & 8) ? 1 : 0); break;
+		}
+
+		if (high & 0x80)
 			ret = -ret;
 
 		return ret;

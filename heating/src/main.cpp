@@ -65,9 +65,6 @@ int main(int argc, const char **argv)
 
 			while (1)
 			{
-			//	temp.read();
-			//	temp.dumpReadings();
-
 				control.tick(gpio, cfg.refresh(), temp.read(), userParams.refresh());
 				sleep(1);
 			}

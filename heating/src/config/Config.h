@@ -45,6 +45,8 @@ struct JsonConfig
 	}
 };
 
+void log(const std::string&);
+
 struct UserParams : public JsonConfig
 {
 	int requiredTempInside;
@@ -101,6 +103,10 @@ struct Config : public JsonConfig
 
 	std::string gpioTempMotorSense;
 	std::string gpioBoilerSense;
+
+	std::string controlDir;
+	std::string tempDir;
+	std::string rotateCmd;
 
 	std::vector<int> gpioExports;
 
@@ -184,6 +190,10 @@ struct Config : public JsonConfig
 
 		gpioTempMotorSense = tree.get<std::string>("gpio.tempMotorSense");
 		gpioBoilerSense = tree.get<std::string>("gpio.boilerSense");
+
+		controlDir = tree.get<std::string>("log.controlDir");
+		tempDir = tree.get<std::string>("log.tempDir");
+		rotateCmd = tree.get<std::string>("log.rotateCmd");
 
 		auto &mixTempNode = tree.get_child("mixTemp");
 		for (auto &i : mixTempNode)

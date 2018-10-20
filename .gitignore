@@ -1,1 +1,5 @@
 /heating/board.mak
+/heating/.vs
+/heating/Debug
+/heating/x64
+/testcpp/Debug

@@ -16,7 +16,7 @@
     "furnaceValve": "furnaceValve",
     "boilerValve": "boilerValve",
     "circulationPump": "circulationPump",
-    "radiatorPump":  "radiatorPump",
+    "radiatorPump": "radiatorPump",
     "tempMotorSense": "tempMotorSense",
     "boilerSense": "boilerSense"
   },
@@ -67,6 +67,11 @@
     "-21": 60,
     "-10": 50,
     "2": 38
+  },
+
+  "log": {
+    "controlDir": "/logs/heating/control",
+    "tempDir": "/logs/heating/temp",
+    "rotateCmd": "find /logs/heating -type f -ctime +5 | xargs /bin/rm"
   }
 }
-
