@@ -115,6 +115,7 @@ namespace Heat
 				log("Control: reservoir heating ready");
 
 				gpio.furnaceValveOpen();
+				gpio.boilerValveOpen();
 
 				_state = State::ResColdStartPump;
 
@@ -127,6 +128,8 @@ namespace Heat
 				gpio.furnacePumpOn();
 
 				gpio.openReservoirLine(cfg);
+
+				gpio.boilerValveClose();
 
 				gpio.furnaceOn();
 
@@ -170,6 +173,8 @@ namespace Heat
 			}
 		}
 
+		int _circulationChecksFailed;
+
 		void _safetyCheck(Gpio &gpio, Config &cfg, Temperature &temp)
 		{
 			if (temp.furnaceHot())
@@ -180,15 +185,23 @@ namespace Heat
 
 			if (gpio.isFurnaceOn() && !temp.circulationGood())
 			{
-				gpio.furnaceOff();
-				throw std::runtime_error("Circulation failure detected");
+				const int maxCirculationCheckFailures = 5; // long cycle provided by valve turn 
+				if (++_circulationChecksFailed >= maxCirculationCheckFailures)
+				{
+					gpio.furnaceOff();
+					throw std::runtime_error("Circulation failure detected");
+				}
+				else
+					return;
 			}
+
+			_circulationChecksFailed = 0;
 		}
 
 	public:
 
 		Control(Gpio &gpio, Config &cfg)
-			: _state(State::ResHot), _mixer(cfg, gpio)
+			: _state(State::ResHot), _mixer(cfg, gpio), _circulationChecksFailed(0)
 		{
 		}
 

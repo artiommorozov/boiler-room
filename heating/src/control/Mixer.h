@@ -227,7 +227,7 @@ namespace Heat
 		Mixer(Config &cfg, Gpio &gpio)
 			: _needsHeat(false), _quit(false),
 			_insideExpectedTemp(21), _insideActualTemp(21), _outsideTemp(21),
-			_mixInHotTemp(0), _mixInColdTemp(0), _mixResultTemp(0),
+			_mixInHotTemp(21), _mixInColdTemp(21), _mixResultTemp(21),
 			_mixPos(MixPos::Med),
 			_valvePos(gpio, cfg)
 		{

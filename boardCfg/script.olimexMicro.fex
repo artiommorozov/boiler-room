@@ -985,7 +985,7 @@ LV7_volt = 1050
 
 [gpio_para]
 gpio_used = 1
-gpio_num = 73
+gpio_num = 74
 gpio_pin_1 = port:PG00<0><default><default><default>
 gpio_pin_2 = port:PG01<0><default><default><default>
 gpio_pin_3 = port:PG02<0><default><default><default>
@@ -1059,6 +1059,7 @@ gpio_pin_70 = port:PE08<0><default><default><default>
 gpio_pin_71 = port:PE09<0><default><default><default>
 gpio_pin_72 = port:PE10<0><default><default><default>
 gpio_pin_73 = port:PE11<0><default><default><default>
+gpio_pin_74 = port:PC03<0><default><default><default>
 
 
 [gpio_init]
@@ -1135,7 +1136,7 @@ pin_70 = port:PE08<0><default><default><default>
 pin_71 = port:PE09<0><default><default><default>
 pin_72 = port:PE10<0><default><default><default>
 pin_73 = port:PE11<0><default><default><default>
-
+pin_74 = port:PC03<0><default><default><default>
 
 [softpwm_para]
 softpwm_used = 1

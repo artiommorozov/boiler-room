@@ -206,7 +206,7 @@ namespace Ds2482
 
 			write(cmd);
 
-			waitReady();
+			waitReady(false);
 		}
 
 		unsigned char oneWireTriplet(bool directionTo1)

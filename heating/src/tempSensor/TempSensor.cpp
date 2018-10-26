@@ -7,6 +7,7 @@
 #include "util/dbglog.h"
 #include <map>
 #include <algorithm>
+#include <iostream>
 
 using namespace Temp;
 
@@ -32,7 +33,7 @@ protected:
 		for (auto &i : sensors)
 		{
 			Sensor *s = (Sensor*)i.get();
-			auto group = perLine[s->_port.index()];
+			auto &group = perLine[s->_port.index()];
 			group.sensors.push_back(i);
 			group.port = &s->_port;
 		}
@@ -43,17 +44,19 @@ protected:
 	static std::map< OneWire::Rom, int > readAllWhenReady(std::map<Ds2482::AdapterPort, LineBulkQuery> &perLine)
 	{
 		std::map< OneWire::Rom, int > readings;
-		for (auto lineSensors : perLine)
+		for (auto &lineSensors : perLine)
 		{
 			Port &port = *lineSensors.second.port;
-			OneWire::session(port, std::string("waiting for conversion to finish"))
+			OneWire::session(port, std::string("waiting for conversion to finish"), false)
 				.perform([](Port &p) { p.waitReadOne(); });
 
 			for (auto &sensor : lineSensors.second.sensors)
 			{
 				const OneWire::Rom &id = sensor->id();
 				OneWire::session(port, std::string("reading temp value of ") + sensor->id().toString())
-					.perform([&](Port &p) { readings[id] = ((Sensor*)sensor.get())->_readScratchpad(port, id); });
+					.perform([&](Port &p) {
+						readings[id] = ((Sensor*)sensor.get())->_readScratchpad(p, id);
+				});
 			}
 		}
 
@@ -104,9 +107,9 @@ public:
 	{
 		std::map<Ds2482::AdapterPort, LineBulkQuery> perLine = groupByLine(sensors);
 
-		for (auto lineSensors : perLine)
+		for (auto &lineSensors : perLine)
 			OneWire::session(*lineSensors.second.port, "starting conversion")
-				.perform([](Port &p) { Ds18b20::bulkConvert(p); });
+			.perform([](Port &p) { Ds18b20::bulkConvert(p); });
 		
 		std::map< OneWire::Rom, int > readings = readAllWhenReady(perLine);
 
@@ -135,7 +138,7 @@ namespace Temp
 				.perform(
 					[&](Port &p)
 					{
-						for (auto id : p.searchRom())
+						for (auto &id : p.searchRom())
 						{
 						//	std::cout << " on line " << line << " found id " << id.toString() << "\n";
 							ret.push_back(std::shared_ptr<ISensor>(new Sensor(ds2482, line, id)));

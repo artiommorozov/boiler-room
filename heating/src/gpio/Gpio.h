@@ -49,16 +49,26 @@ public:
 
 	bool isLow()
 	{
-		_f.seekg(0);
+		constexpr int
+			polls = 10,
+			timeoutMsec = 1;
 
-		std::string v;
-		std::getline(_f, v);
-		if (v == "1")
-			return false;
-		else if (v == "0")
-			return true;
+		int ones = 0;
+		for (int i = 0; i < polls; ++i)
+		{
+			_f.seekg(0);
 
-		throw std::runtime_error(std::string("Reading from pin ") + name() + " produced invalid value=" + v);
+			std::string v;
+			std::getline(_f, v);
+			if (v == "1")
+				++ones;
+			else if (v != "0")
+				throw std::runtime_error(std::string("Reading from pin ") + name() + " produced invalid value=" + v);
+
+			usleep(timeoutMsec * 1000);
+		}
+
+		return ones < polls / 2;
 	}
 };
 
@@ -84,6 +94,7 @@ public:
 	{
 		bool ret = !_low;
 
+		_f.seekp(0);
 		_f << "0\n";
 		_f.flush();
 		_low = true;
@@ -95,6 +106,7 @@ public:
 	{
 		bool ret = _low;
 
+		_f.seekp(0);
 		_f << "1\n";
 		_f.flush();
 		_low = false;

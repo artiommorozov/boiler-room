@@ -2,7 +2,7 @@
 
 #include <unistd.h>
 
-template< int TotalWaitMsec = 5 * 1000, int IntervalMsec = 50 >
+template< int TotalWaitMsec = 5 * 1000, int IntervalMsec = 1 >
 struct PeriodicCheckWait 
 {
 	template< typename T >

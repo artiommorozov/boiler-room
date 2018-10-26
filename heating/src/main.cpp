@@ -26,10 +26,26 @@ int dumpTemp(const char *device, const char *port)
 {
 	try
 	{
-		for (auto i : Temp::openAllDs2482_800(device, strtol(port, nullptr, 16)))
+		auto sensors = Temp::openAllDs2482_800(device, strtol(port, nullptr, 16));
+		for (auto &i : sensors)
 		{
-			auto id = i->id();
-			std::cout << "sensor " << id.toString() << " reads=" << i->read() << "\n";
+			const auto &id = i->id();
+			std::cout << "sensor " << id.toString() << " reads " << i->read() << "*C\n";
+		}
+
+		while (1)
+		{
+			auto readings = Temp::bulkRead(sensors);
+			time_t sec;
+			time(&sec);
+			char buf[0xff];
+			ctime_r(&sec, buf);
+
+			for (size_t k = 0; k < sensors.size(); ++k)
+			{	
+				std::cout << buf;
+				std::cout << sensors[k]->id().toString() << " reads " << readings[k] << "*C\n";
+			}
 		}
 	}
 	catch (const std::exception &e)
@@ -55,6 +71,8 @@ int main(int argc, const char **argv)
 	try
 	{
 		Config cfg(argv[1]);
+		Logging::initFrom(cfg);
+
 		Temperature temp(cfg);
 		UserParams userParams(argv[2]);
 		Gpio gpio(cfg);
