@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include "config/Config.h"
+#include <mutex>
 
 namespace Logging
 {
@@ -15,8 +16,9 @@ namespace Logging
 		Control
 	};
 
-	static std::shared_ptr<Ostream> control;
-	static std::shared_ptr<Ostream> temp;
+	static std::mutex logMutex;
+	static std::shared_ptr<Ostream> control{ new std::stringstream };
+	static std::shared_ptr<Ostream> temp{ new std::stringstream };
 
 	static std::string controlDir, tempDir, rotateCmd;
 
@@ -33,8 +35,13 @@ namespace Logging
 			lastDay = now.tm_mday;
 
 			std::string filename(std::string("/day") + std::to_string(lastDay) + ".txt");
-			control.reset(new std::ofstream(controlDir + filename, std::ios::ate));
-			temp.reset(new std::ofstream(tempDir + filename, std::ios::ate));
+
+			{
+				std::lock_guard< std::mutex > l{ logMutex };
+				control.reset(new std::ofstream(controlDir + filename, std::ios::app));
+				temp.reset(new std::ofstream(tempDir + filename, std::ios::app));
+			}
+
 			system(rotateCmd.c_str());
 		}
 	}
@@ -65,18 +72,17 @@ namespace Logging
 		ctime_r(&sec, buf);
 		buf[strlen(buf) - 1] = 0;
 
-		std::stringstream out;
-		out << ((const char*)buf) << ": " << msg << "\n";
-
 		if (dst == Dst::Temp)
 		{
-			if (temp)
-				(*temp) << out.str();
+			std::lock_guard< std::mutex > l{ logMutex };
+			(*temp) << ((const char*)buf) << "," << msg << "\n";
+			temp->flush();
 		}
-		else if (control)
-			(*control) << out.str();
-
-		std::cout << out.str();
+		else 
+		{
+			(*control) << ((const char*)buf) << ": " << msg << "\n";
+			control->flush();
+		}
 	}
 }
 

@@ -161,7 +161,7 @@ public:
 	{
 		_furnace->low();
 
-		if (!_furnaceOn)
+		if (_furnaceOn)
 		{
 			_furnaceOn = false;
 			log("furnace off");
