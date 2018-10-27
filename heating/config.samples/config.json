@@ -5,9 +5,9 @@
   },
 
   "gpio": {
-    "export": [ 1, 2, 3 ],
+    "export": [ 1, 2, 3, ... ],
 
-    "motorTempUp": "motorTempUp",
+    "motorTempUp": "/sys/class/gpio/gpioN_pinX",
     "motorTempDown": "motorTempDown",
     "motorCloseBoiler": "motorCloseBoiler",
     "motorOpenBoiler": "motorOpenBoiler",
@@ -59,14 +59,17 @@
     "boilerHeatMin": 2,
     "furnacePumpRunoutMin": 3,
     "circulationPumpIdleMin": 120,
-    "circulationPumpRunMin": 3
+    "circulationPumpRunMin": 2,
+    "allowCirculationDiffSec": 90
   },
 
   "mixTemp": {
     "-33": 70,
     "-21": 60,
     "-10": 50,
-    "2": 38
+    "2": 38,
+    "10": 30,
+    "15": 20
   },
 
   "log": {

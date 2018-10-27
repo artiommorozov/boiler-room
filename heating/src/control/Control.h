@@ -185,8 +185,8 @@ namespace Heat
 
 			if (gpio.isFurnaceOn() && !temp.circulationGood())
 			{
-				const int maxCirculationCheckFailures = 5; // long cycle provided by valve turn 
-				if (++_circulationChecksFailed >= maxCirculationCheckFailures)
+				constexpr int checksPerMinute = 24, secPerMinute = 60;
+				if (++_circulationChecksFailed >= (cfg.allowCirculationDiffSec * checksPerMinute) / secPerMinute)
 				{
 					gpio.furnaceOff();
 					throw std::runtime_error("Circulation failure detected");

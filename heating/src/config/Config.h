@@ -126,6 +126,7 @@ struct Config : public JsonConfig
 	int furnacePumpRunoutMin;
 	int circulationPumpIdleMin;
 	int circulationPumpRunMin;
+	int allowCirculationDiffSec;
 
 	std::list< std::function< void(const Config &cfg) > > _updateListeners;
 
@@ -176,6 +177,7 @@ struct Config : public JsonConfig
 		furnacePumpRunoutMin = tree.get<int>("delay.furnacePumpRunoutMin");
 		circulationPumpIdleMin = tree.get<int>("delay.circulationPumpIdleMin");
 		circulationPumpRunMin = tree.get<int>("delay.circulationPumpRunMin");
+		allowCirculationDiffSec = tree.get<int>("delay.allowCirculationDiffSec");
 
 		gpioMotorTempUp = tree.get<std::string>("gpio.motorTempUp");
 		gpioMotorTempDown = tree.get<std::string>("gpio.motorTempDown");
