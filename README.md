@@ -1,4 +1,4 @@
-[Русский][#Коротко]
+[Русский][#ru]
 
 ## General
 
@@ -38,6 +38,7 @@ fex file for enabling PE port GPIO on Olimex A20 Micro
 Code for using DS18b20 via DS2482-800 is for kernel 3.4 that i have on Olimex board. On newer kernel
 one might use kernel module.
 
+### ru
 ## Коротко
 
 Моя котельная построена на плате Olimex linuxino A20 micro, в принципе этот код должен быть
