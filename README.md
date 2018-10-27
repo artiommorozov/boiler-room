@@ -1,4 +1,4 @@
-[Русский][ru]
+[Русский][#Коротко]
 
 ## General
 
@@ -31,14 +31,12 @@ selection is not limited.
 ### boardCfg
 
 fex file for enabling PE port GPIO on Olimex A20 Micro
-[How to use] (http://linux-sunxi.org/GPIO)
+[How to use](http://linux-sunxi.org/GPIO)
 
 ## Notes
 
 Code for using DS18b20 via DS2482-800 is for kernel 3.4 that i have on Olimex board. On newer kernel
 one might use kernel module.
-
-[ru]: .
 
 ## Коротко
 
@@ -70,7 +68,7 @@ GPIO можно выбирать по вкусу =)
 ### boardCfg
 
 fex для включения GPIO порта pe и pc3 на Olimex A20 micro.
-[Как пользоваться] (http://linux-sunxi.org/GPIO)
+[Как пользоваться](http://linux-sunxi.org/GPIO)
 
 ## Заметки
 
