@@ -12,11 +12,11 @@ GPIO and I2C access.
 sources for 'heating' binary. It takes config.json, periodically polls for userConfig.json and
 controls hardware. See examples in heating/config.samples
 
-Changes in configs are loaded on change, except for outside to mix temp curve settings.
+Changes in configs are loaded on change, except for outside-to-mix-temp curve settings.
 
 ### roomDrawing
 
-drawing of boiler room hardware - TBD
+drawing of boiler room hardware with matching parts in config.json
 
 ### schematics
 
@@ -33,10 +33,17 @@ selection is not limited.
 fex file for enabling PE port GPIO on Olimex A20 Micro
 [How to use](http://linux-sunxi.org/GPIO)
 
+### testcpp 
+
+test project with stubs to allow running heating binary on windows under MSVC2017
+
 ## Notes
 
 Code for using DS18b20 via DS2482-800 is for kernel 3.4 that i have on Olimex board. On newer kernel
 one might use kernel module.
+
+You can use any source for outside temperature and update userConfig.json. My selection is 'feels like'
+section of local weather forecast service.
 
 ### ru
 ## Коротко
@@ -53,7 +60,7 @@ one might use kernel module.
 
 ### roomDrawing
 
-Схема котельной - доделаю скоро
+Схема котельной, показывает расположение датчиков и элементов управления из config.json
 
 ### schematics
 
@@ -71,7 +78,13 @@ GPIO можно выбирать по вкусу =)
 fex для включения GPIO порта pe и pc3 на Olimex A20 micro.
 [Как пользоваться](http://linux-sunxi.org/GPIO)
 
+### testcpp 
+
+тестовый проект с заглушками, чтобы отлаживать heating в MSVC2017
+
 ## Заметки
 
 На новых ядрах есть драйвер для ds2482, код может быть проще. На А20 micro доступно только старое ядро
 3.4
+
+Источник погоды для userConfig.json подойдет любой, мне нравится сайт прогноза погоды.
