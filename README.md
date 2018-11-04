@@ -33,6 +33,14 @@ selection is not limited.
 fex file for enabling PE port GPIO on Olimex A20 Micro
 [How to use](http://linux-sunxi.org/GPIO)
 
+### htmlGraph
+
+Operation history (TODO) and temperature sensors history via browser. Web server on board should expose 
+this folder along with config.json as /config/config.json and log files as per config.json "web" section.
+Index for logging directories should be turned on.
+
+Data filters on page are persistent.
+
 ### testcpp 
 
 test project with stubs to allow running heating binary on windows under MSVC2017
@@ -77,6 +85,14 @@ GPIO можно выбирать по вкусу =)
 
 fex для включения GPIO порта pe и pc3 на Olimex A20 micro.
 [Как пользоваться](http://linux-sunxi.org/GPIO)
+
+### htmlGraph
+
+История управления (TODO) и история показаний датчиков в браузере. Веб сервер на плате должен 
+отдавать эту директорию, config.json как /config/config.json и директории логов согласно
+разделу "web" в config.json. Индекс для директорий логов должен быть включен.
+
+Фильтр данных сохраняется при перезагрузке страницы.
 
 ### testcpp 
 

@@ -1,0 +1,158 @@
+<html>
+<head>
+<script src="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
+<link rel="stylesheet" src="//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css" />
+</head>
+<body>
+<div id="temp" style="width:100%;height:90%"></div>
+<div id="visibleCtrl"></div>
+<p>Zoom: click-drag, Pan: shift-click-drag, Restore: double-click 
+<div id="data" style="visibility: hidden;height:0%"></div>
+
+<script type="text/javascript">
+
+run();
+
+async function run() {
+	try {
+		const cfg = await loadConfig();
+		const tempLinks = await loadTempLinks(cfg.web.tempDir);
+		
+		let data = '';
+		for (const tempFile of tempLinks)
+			data += await loadUrl(tempFile);
+				
+		const lines = data
+			.split('\n')
+			.filter((i) => i.indexOf(',') > 0)
+			.map((line) => {
+				const ret = line.split(',').filter((v, index) => !(index & 1));
+				ret[0] = new Date(ret[0]);
+				return ret.map((i, index) => index > 0 ? Number.parseInt(i, 10) : i);
+			});
+
+		const testLine = data.substr(0, data.indexOf('\n'))
+		const labels = makeTempLabels(testLine, cfg);
+		drawTempGraph(lines.sort((a, b) => a[0].getTime() - b[0].getTime()), labels, loadFilter(labels));
+			
+	} catch (e) {
+		alert(e);
+		console.log(e.stack);
+	}
+}
+
+function makeTempLabels(str, cfg) {
+	const ids = str.split(',').filter((v, index) => index & 1);
+	
+	const ret = [
+		[ 'Комната', ids.indexOf(cfg.tempSensors.room) ], 
+		[ 'Котел/подача А', ids.indexOf(cfg.tempSensors.furnace.outA) ],
+		[ 'Котел/подача В', ids.indexOf(cfg.tempSensors.furnace.outB) ],
+		[ 'Котел/обратка', ids.indexOf(cfg.tempSensors.furnace.return) ],
+		[ 'Накопитель', ids.indexOf(cfg.tempSensors.reservoir) ],
+		[ 'Подмес/горячая', ids.indexOf(cfg.tempSensors.mix.reservoir) ],
+		[ 'Подмес/холодная', ids.indexOf(cfg.tempSensors.mix.return) ],
+		[ 'Подмес/выход', ids.indexOf(cfg.tempSensors.mix.out) ],
+		[ 'Радиаторы А', ids.indexOf(cfg.tempSensors.radiators.returnB) ],
+		[ 'Радиаторы В', ids.indexOf(cfg.tempSensors.radiators.returnA) ],
+	];
+	
+	ret.sort((a, b) => a[1] - b[1]);
+	
+	document.getElementById('visibleCtrl').innerHTML = ret.map(([name], index) => `<input type=checkbox id=${index} onClick="visibilityToggle(this)" checked> <label for="${index}"> ${name}</label>`);
+	
+	return ret.map(([name]) => name);
+}
+
+async function loadUrl(url) {
+	return new Promise((resolve, reject) => {
+	
+		var req = new XMLHttpRequest();	
+		req.open('GET', url);
+		req.onreadystatechange = () => {
+			if (req.readyState == 4) {
+				if (req.status == 200) 
+					resolve(req.responseText);
+				else
+					reject(`${url}: ${req.statusText}`);
+			}
+		};
+		req.send();	
+	});
+}
+
+async function loadConfig() {
+	return JSON.parse(await loadUrl('/config/config.json'));
+}
+	
+async function loadTempLinks(indexUrl) {
+	const index = await loadUrl(indexUrl);
+	const dataDiv = document.getElementById('data');
+	dataDiv.innerHTML = index;
+	
+	const origin = window.location.protocol + "//" + window.location.hostname;
+
+	return [...dataDiv.getElementsByTagName('a')]
+		.map((a) => a.href)
+		.filter((href) => href.indexOf('?') < 0 && href.startsWith(origin) && !href.endsWith('/'));
+}	
+	
+let visibilityFilter = [];
+
+function updateFilter(id, checked) {
+	visibilityFilter[id] = checked;
+	const exp = new Date();
+	exp.setYear(exp.getFullYear() + 1);
+	document.cookie = `tempFilter=${visibilityFilter.map((i) => i ? 1 : 0).join('-')}; expires=${exp.toUTCString()}; path=/`;
+}
+
+function loadFilter(labels) {
+	const cookieMap = new Map(document.cookie.split(';').map((i) => i.split('=')));
+	
+	let ret = [];
+	
+	const tempFilter = cookieMap.get('tempFilter');
+	if (!tempFilter)
+		ret = labels.map((i) => true);
+	else {
+		ret = tempFilter.split('-').map((i) => !!Number.parseInt(i, 10));
+		ret.forEach((i, index) => {
+			if (!i)
+				document.getElementById(index.toString()).checked = false;
+		});
+	}
+	
+	visibilityFilter = ret;
+		
+	return ret;
+}	
+	
+var tempGraph;
+	
+function drawTempGraph(data, labels, visibility) {
+
+  tempGraph = new Dygraph(
+
+    // containing div
+    document.getElementById("temp"),
+	data,
+	{ 
+//		legend: 'always',
+		ylabel: 'Temp C*',
+//		showRangeSelector: true,
+		valueRange: [0,100],
+//		stepPlot: true,
+		labels: ['Дата', ...labels],
+		visibility: visibility,
+		colors: ['#4CAF50', '#F44336', '#F44336', '#FF9800', '#8BC34A', '#FFC107', '#03A9F4', '#009688', '#000000', '#000000'],
+	 }
+  );
+}
+
+function visibilityToggle(el) {
+	const id = Number.parseInt(el.id, 10);
+	tempGraph.setVisibility(id, el.checked);
+	updateFilter(id, el.checked);
+}
+</script>
+</body></html>
