@@ -91,10 +91,11 @@ async function loadTempLinks(indexUrl) {
 	dataDiv.innerHTML = index;
 	
 	const origin = window.location.protocol + "//" + window.location.hostname;
-
+	
 	return [...dataDiv.getElementsByTagName('a')]
 		.map((a) => a.href)
-		.filter((href) => href.indexOf('?') < 0 && href.startsWith(origin) && !href.endsWith('/'));
+		.filter((href) => href.indexOf('?') < 0 && href.startsWith(origin) && !href.endsWith('/'))
+		.map((href) => indexUrl + '/' + href.split('/').pop());
 }	
 	
 let visibilityFilter = [];
