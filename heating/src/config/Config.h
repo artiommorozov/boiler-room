@@ -20,7 +20,7 @@ struct JsonConfig
 
 	virtual void loadFromPropertyTree(boost::property_tree::ptree &tree) = 0;
 
-	void refresh()
+	bool refresh()
 	{
 		using namespace boost::property_tree;
 
@@ -28,7 +28,7 @@ struct JsonConfig
 		{
 			std::time_t lastWrite = boost::filesystem::last_write_time(boost::filesystem::path(_filename));
 			if (lastWrite == _lastWrite)
-				return;
+				return false;
 
 			ptree tree;
 			std::ifstream file(_filename.c_str());
@@ -37,11 +37,14 @@ struct JsonConfig
 			loadFromPropertyTree(tree);
 
 			_lastWrite = lastWrite;
+			return true;
 		}
 		catch (const std::exception &e)
 		{
 			throw std::runtime_error(std::string("Failed to read json config ") + _filename + ", err=" + e.what());
 		}
+
+		return false;
 	}
 };
 
@@ -207,10 +210,11 @@ struct Config : public JsonConfig
 
 	Config& refresh()
 	{
-		JsonConfig::refresh();
-
-		for (auto &i : _updateListeners)
-			i(*this);
+		if (JsonConfig::refresh())
+		{
+			for (auto &i : _updateListeners)
+				i(*this);
+		}
 
 		return *this;
 	}

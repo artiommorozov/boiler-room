@@ -75,7 +75,7 @@
   "log": {
     "controlDir": "/logs/heating/control",
     "tempDir": "/logs/heating/temp",
-    "rotateCmd": "find /logs/heating -type f -ctime +5 | xargs /bin/rm"
+    "rotateCmd": "find /logs/heating -type f -ctime +5 | xargs /bin/rm -f"
   },
 
   "web": {

@@ -30,7 +30,7 @@ namespace Logging
 		time_t sec;
 		time(&sec);
 		localtime_r(&sec, &now);
-		if (force || (now.tm_mday != lastDay && controlDir.length() && tempDir.length()))
+		if (force || ((now.tm_mday != lastDay) && controlDir.length() && tempDir.length()))
 		{
 			lastDay = now.tm_mday;
 
