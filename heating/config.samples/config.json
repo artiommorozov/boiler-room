@@ -22,10 +22,10 @@
   },
 
   "tempSensors": {
-    "room": "idroom",
+    "room": "10F811600308009B",
 
     "furnace": {
-      "outA": "idfurnoutA",
+      "outA": "280212750A0000CC",
       "outB": "idfurnoutB",
       "return": "idfurnret"
     },
@@ -52,14 +52,14 @@
   },
 
   "valves": {
-    "fullTurnSec": 12
+    "fullTurnSec": 120
   },
 
   "delay": {
-    "boilerHeatMin": 2,
-    "furnacePumpRunoutMin": 3,
+    "boilerHeatMin": 60,
+    "furnacePumpRunoutMin": 5,
     "circulationPumpIdleMin": 120,
-    "circulationPumpRunMin": 2,
+    "circulationPumpRunMin": 1,
     "allowCirculationDiffSec": 90
   },
 
