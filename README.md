@@ -12,7 +12,7 @@ GPIO and I2C access.
 sources for 'heating' binary. It takes config.json, periodically polls for userConfig.json and
 controls hardware. See examples in heating/config.samples
 
-Changes in configs are loaded on change, except for outside-to-mix-temp curve settings.
+Changes in configs are loaded on change.
 
 ### roomDrawing
 
@@ -67,7 +67,7 @@ one might use kernel module.
 ### heating
 
 Исходники для бинарника heating. Загружает config.json и userConfig.json и управляет устройствами.
-Настройки (кроме кривой отопления) подгружаются по мере изменений. См. примеры в heating/config.samples
+Настройки подгружаются по мере изменений. См. примеры в heating/config.samples
 
 ### roomDrawing
 
