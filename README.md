@@ -45,13 +45,16 @@ Data filters on page are persistent.
 
 test project with stubs to allow running heating binary on windows under MSVC2017
 
+### weather
+
+You can use any source for outside temperature and update userConfig.json. My selection is 'feels like'
+section of local weather forecast service.
+
 ## Notes
 
 Code for using DS18b20 via DS2482-800 is for kernel 3.4 that i have on Olimex board. On newer kernel
 one might use kernel module.
 
-You can use any source for outside temperature and update userConfig.json. My selection is 'feels like'
-section of local weather forecast service.
 
 ### ru
 ## Коротко
@@ -98,9 +101,12 @@ fex для включения GPIO порта pe и pc3 на Olimex A20 micro.
 
 тестовый проект с заглушками, чтобы отлаживать heating в MSVC2017
 
+### weather
+
+Источник погоды для userConfig.json подойдет любой, мне нравится сайт прогноза погоды, раздел "ощущается как".
+
 ## Заметки
 
 На новых ядрах есть драйвер для ds2482, код может быть проще. На А20 micro доступно только старое ядро
 3.4
 
-Источник погоды для userConfig.json подойдет любой, мне нравится сайт прогноза погоды.
