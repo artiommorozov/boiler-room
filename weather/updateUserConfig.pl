@@ -6,7 +6,7 @@ my $out = `lynx -dump -accept_all_cookies https://your_url_here`;
 
 my $temp = $1 if $out =~ /Ощущается\s+как\s+\+?([0-9-]+)/s; 
 
-die "no temp value in $out" unless $temp;
+die "no temp value in $out" unless length($temp);
 
 
 
