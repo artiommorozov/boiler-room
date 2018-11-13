@@ -155,16 +155,16 @@ namespace Heat
 				{
 					if (_pumpTimer.expired())
 						gpio.furnacePumpOff();
+				}
 
-					if (_valveTimer.expired())
-					{
-						log("Control: reservoir hot");
+				if (!gpio.isFurnacePumpOn() && _valveTimer.expired())
+				{
+					log("Control: reservoir hot");
 
-						gpio.furnaceValveClose();
-						gpio.closeReservoirLine(cfg);
+					gpio.furnaceValveClose();
+					gpio.closeReservoirLine(cfg);
 
-						_state = State::ResHot;
-					}
+					_state = State::ResHot;
 				}
 			} break;
 

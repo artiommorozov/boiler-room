@@ -113,6 +113,11 @@ public:
 
 		return ret;
 	}
+
+	bool isLow() const
+	{
+		return _low;
+	}
 };
 
 class Gpio : boost::noncopyable
@@ -128,12 +133,11 @@ class Gpio : boost::noncopyable
 
 	std::unique_ptr< GpioInPin > _tempMotorSense, _boilerSense;
 
-	bool _furnaceOn;
 	bool _resLineClosed;
 
 public:
 	explicit Gpio(const Config &cfg)
-		: _furnaceOn(false), _resLineClosed(false)
+		: _resLineClosed(false)
 	{
 		for (int x : cfg.gpioExports)
 			_export(x);
@@ -159,18 +163,12 @@ public:
 
 	void furnaceOff()
 	{
-		_furnace->low();
-
-		if (_furnaceOn)
-		{
-			_furnaceOn = false;
+		if (_furnace->low())
 			log("furnace off");
-		}
 	}
 
 	void furnaceOn()
 	{
-		_furnaceOn = true;
 		_furnace->high();
 
 		log("furnace ON");
@@ -178,7 +176,7 @@ public:
 
 	bool isFurnaceOn() const
 	{
-		return _furnaceOn;
+		return !_furnace->isLow();
 	}
 
 	void furnacePumpOn()
@@ -193,6 +191,11 @@ public:
 		_furnacePump->low();
 
 		log("furnace pump off");
+	}
+
+	bool isFurnacePumpOn() const
+	{
+		return !_furnacePump->isLow();
 	}
 
 	void boilerValveOpen()
