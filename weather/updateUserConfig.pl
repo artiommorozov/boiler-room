@@ -9,7 +9,7 @@ $temp =~ s/\s+//g;
 $temp =~ s/(\d+).*$/$1/s;
 $temp = "-$1" unless $temp =~ /^\d/;
 
-die "no temp value ($temp) in $out" unless length($temp);
+die "no temp value ($temp) in $out" unless $temp =~ /\d/;
 
 
 open(F, ">config/userConfig.json");
