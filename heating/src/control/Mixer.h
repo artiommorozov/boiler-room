@@ -8,6 +8,39 @@
 
 namespace Heat
 {
+    struct OutsideTemp
+    {
+        int actual;
+        int effective;
+        int actualToExpInnerDelta;
+
+        OutsideTemp()
+            : actual(0), effective(0), actualToExpInnerDelta(0)
+        {
+        }
+
+        OutsideTemp(int anActual, int anActualToExpInnerDelta)
+            : actual(anActual), actualToExpInnerDelta(anActualToExpInnerDelta)
+        {
+            // TODO: to config?
+            const int innerDeltaCorrection = 5;
+            effective = actual + innerDeltaCorrection * actualToExpInnerDelta;
+        }
+
+        operator int() const
+        {
+            return effective;
+        }
+
+        std::string toString() const
+        {
+            return std::string("{ effective=") + std::to_string(effective)
+                + " actual=" + std::to_string(actual)
+                + " inner delta=" + std::to_string(actualToExpInnerDelta)
+                + " }";
+        }
+    };
+
 	class MixTempApprox
 	{
 		std::mutex _mutex;
@@ -36,7 +69,7 @@ namespace Heat
 			cfg.addUpdateListener([this](const Config &v) { this->_updateFromCfg(v); });
 		}
 
-		int getMixTemp(int outside, std::string *log)
+		int getMixTemp(const OutsideTemp &outside, std::string *log)
 		{
 			std::lock_guard< std::mutex > l{ _mutex };
 
@@ -44,7 +77,7 @@ namespace Heat
 				max = _mixTemps.begin(),
 				min = _mixTemps.begin() + 1;
 
-			while (min != _mixTemps.end() && min->first < outside)
+			while (min != _mixTemps.end() && min->first < (int) outside)
 			{
 				++min;
 				++max;
@@ -55,11 +88,11 @@ namespace Heat
 			
 			*log = std::string("Mixer: using interval ") + std::to_string(max->first) + " to " + std::to_string(min->first);
 
-			double x = (double) min->first - outside;
+			double x = (double) min->first - (int) outside;
 			double xWidth = (double) min->first - max->first;
 			int ret = (int) (min->second + x / xWidth * (max->second - min->second));
 
-			*log += std::string("\nMixer: for outside=") + std::to_string(outside) + " need mix=" + std::to_string(ret);
+			*log += std::string("\nMixer: for outside=") + outside.toString() + " need mix=" + std::to_string(ret);
 
 			return ret;
 		}
@@ -114,15 +147,15 @@ namespace Heat
 		struct MixSettings
 		{
 			int mixOut;
-			int outsideTemp;
+            OutsideTemp outsideTemp;
 			std::string updateLog;
 
 			MixSettings()
-				: mixOut(0), outsideTemp(0)
+				: mixOut(0)
 			{
 			}
 
-			MixSettings(int outside, const std::shared_ptr<MixTempApprox> &tempApprox)
+			MixSettings(const OutsideTemp &outside, const std::shared_ptr<MixTempApprox> &tempApprox)
 				: mixOut(0), outsideTemp(outside)
 			{
 				mixOut = tempApprox->getMixTemp(outside, &updateLog);
@@ -130,26 +163,12 @@ namespace Heat
 
 			bool operator ==(const MixSettings &other) const
 			{
-				return outsideTemp == other.outsideTemp
+				return outsideTemp.effective == other.outsideTemp.effective
 					&& mixOut == other.mixOut;
 			}
 		} _mixSettings;
 
 		ValvePosition _valvePos;
-
-		int _effectiveOutsideTemp()
-		{
-			// TODO: to config?
-			const int innerDeltaCorrection = 5;
-
-			int usingOutsideTemp = _outsideTemp;
-			if (_insideActualTemp < _insideExpectedTemp)
-				usingOutsideTemp -= innerDeltaCorrection;
-			else if (_insideActualTemp > _insideExpectedTemp)
-				usingOutsideTemp += innerDeltaCorrection;
-
-			return usingOutsideTemp;
-		}
 
 		void _mixerThread(Gpio &gpio, const std::shared_ptr<MixTempApprox> &tempApprox)
 		{
@@ -157,7 +176,9 @@ namespace Heat
 
 			for (; !_quit; sleep(checkIntervalSec))
 			{
-				MixSettings current{ _effectiveOutsideTemp(), tempApprox };
+				MixSettings current(
+                    OutsideTemp(_outsideTemp, _insideActualTemp - _insideExpectedTemp),
+                    tempApprox);
 				
 				if (!(current == _mixSettings))
 				{
