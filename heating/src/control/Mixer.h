@@ -169,11 +169,13 @@ namespace Heat
 		} _mixSettings;
 
 		ValvePosition _valvePos;
+		constexpr static int checkIntervalSec = 5;
+		constexpr static size_t minCyclesBeforePumpOff = 2 * 60 / checkIntervalSec;
+		constexpr static size_t cyclesForInstantPumpOff = 1;
+		size_t _cyclesToPumpOff;
 
 		void _mixerThread(Gpio &gpio, const std::shared_ptr<MixTempApprox> &tempApprox)
 		{
-			const int checkIntervalSec = 5;
-
 			for (; !_quit; sleep(checkIntervalSec))
 			{
 				MixSettings current(
@@ -207,6 +209,7 @@ namespace Heat
 			if (_mixPos != MixPos::Max)
 			{
 				gpio.radiatorPumpOn();
+				_cyclesToPumpOff = minCyclesBeforePumpOff;
 				_valvePos.adjustBy(1, gpio);
 			}
 
@@ -216,17 +219,18 @@ namespace Heat
 		void _maxColdFlow(Gpio &gpio)
 		{
 			if (_mixPos != MixPos::Min)
-			{
-				gpio.radiatorPumpOff();
 				_valvePos.adjustBy(-1, gpio);
-			}
-
+			
 			_mixPos = MixPos::Min;
+
+			if (!--_cyclesToPumpOff)
+				gpio.radiatorPumpOff();
 		}
 
 		void _mixSetAndCheck(int requiredMixTemp, Gpio &gpio)
 		{
 			gpio.radiatorPumpOn();
+			_cyclesToPumpOff = minCyclesBeforePumpOff;
 
 			_mixPos = MixPos::Med;
 
@@ -250,7 +254,8 @@ namespace Heat
 			_insideExpectedTemp(21), _insideActualTemp(21), _outsideTemp(21),
 			_mixInHotTemp(21), _mixInColdTemp(21), _mixResultTemp(21),
 			_mixPos(MixPos::Med),
-			_valvePos(gpio, cfg)
+			_valvePos(gpio, cfg),
+			_cyclesToPumpOff(cyclesForInstantPumpOff)
 		{
 			std::shared_ptr< MixTempApprox > tempApprox(new MixTempApprox(cfg));
 
