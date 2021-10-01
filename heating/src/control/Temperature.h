@@ -164,7 +164,7 @@ namespace Heat
 
 		bool heatFlowsFromFurnaceToReservoir() const
 		{
-			return _readings[RESERVOIR_LOW] < _readings[FURNACE_TEMP_A];
+			return _readings[RESERVOIR_LOW] < _readings[FURNACE_TEMP_A] && reservoirHot();
 		}
 
 		bool reservoirHot() const
