@@ -129,7 +129,7 @@ class Gpio : boost::noncopyable
 	}
 
 	std::unique_ptr< GpioOutPin > _motorTempUp, _motorTempDown, _motorCloseBoiler, _motorOpenBoiler, 
-		_furnace, _furnacePump, _furnaceValve, _boilerValve, _circulationPump, _radiatorPump;
+		_furnace, _furnacePump, _pumpValve, _boilerValve, _circulationPump, _radiatorPump, _elHeater;
 
 	std::unique_ptr< GpioInPin > _tempMotorSense, _boilerSense;
 
@@ -148,33 +148,45 @@ public:
 		_motorOpenBoiler.reset(new GpioOutPin(cfg.gpioMotorOpenBoiler));
 		_furnace.reset(new GpioOutPin(cfg.gpioFurnace));
 		_furnacePump.reset(new GpioOutPin(cfg.gpioFurnacePump));
-		_furnaceValve.reset(new GpioOutPin(cfg.gpioFurnaceValve));
+		_pumpValve.reset(new GpioOutPin(cfg.gpioFurnaceValve));
 		_boilerValve.reset(new GpioOutPin(cfg.gpioBoilerValve));
 		_circulationPump.reset(new GpioOutPin(cfg.gpioCirculationPump));
 		_radiatorPump.reset(new GpioOutPin(cfg.gpioRadiatorPump));
-		
+		_elHeater.reset(new GpioOutPin(cfg.gpioElectricHeater));
+
 		_tempMotorSense.reset(new GpioInPin(cfg.gpioTempMotorSense));
 		_boilerSense.reset(new GpioInPin(cfg.gpioBoilerSense));
 
 		log("GPIO init complete");
-
-		closeReservoirLine(cfg);
 	}
 
-	void furnaceOff()
+	void dieselOff()
 	{
 		if (_furnace->low())
-			log("furnace off");
+			log("diesel off");
 	}
 
-	void furnaceOn()
+	void dieselOn()
 	{
 		_furnace->high();
 
 		log("furnace ON");
 	}
 
-	bool isFurnaceOn() const
+	void electricHeaterOff()
+	{
+		if (_elHeater->low())
+			log("electric heater off");
+	}
+
+	void electricHeaterOn()
+	{
+		_elHeater->high();
+
+		log("electric heater ON");
+	}
+
+	bool isDieselOn() const
 	{
 		return !_furnace->isLow();
 	}
@@ -202,6 +214,7 @@ public:
 	{
 		_boilerValve->high();
 		log("boiler valve OPEN");
+		sleep(1);
 	}
 
 	void boilerValveClose()
@@ -210,16 +223,17 @@ public:
 		log("boiler valve closed");
 	}
 
-	void furnaceValveOpen()
+	void pumpValveOpen()
 	{
-		_furnaceValve->high();
-		log("furnace valve OPEN");
+		_pumpValve->high();
+		log("pump valve OPEN");
+		sleep(1);
 	}
 
-	void furnaceValveClose()
+	void pumpValveClose()
 	{
-		_furnaceValve->low();
-		log("furnace valve closed");
+		_pumpValve->low();
+		log("pump valve closed");
 	}
 
 	bool boilerNeedsHeat()
@@ -251,7 +265,7 @@ public:
 			log("radiator pump ON");
 	}
 
-	void closeReservoirLine(const Config &cfg)
+	void closeReservoirLineBegin()
 	{
 		if (_resLineClosed)
 			return;
@@ -261,7 +275,10 @@ public:
 		_motorCloseBoiler->low();
 		sleep(1);
 		_motorOpenBoiler->high();
-		sleep(cfg.valveTurnTimeSec);
+	}
+
+	void void closeReservoirLineEnd()
+	{
 		_motorOpenBoiler->low();
 
 		log("reservoir line CLOSED / boiler line OPENED");
@@ -269,17 +286,20 @@ public:
 		_resLineClosed = true;
 	}
 
-	void openReservoirLine(const Config &cfg)
+	void openReservoirLineBegin()
 	{
 		if (!_resLineClosed)
 			return;
 
-		log("reservoir line open/ boiler line closing");
+		log("reservoir line open / boiler line closing");
 
 		_motorOpenBoiler->low();
 		sleep(1);
 		_motorCloseBoiler->high();
-		sleep(cfg.valveTurnTimeSec);
+	}
+
+	void openReservoirLineEnd()
+	{
 		_motorCloseBoiler->low();
 
 		log("reservoir line OPENED / boiler line CLOSED");

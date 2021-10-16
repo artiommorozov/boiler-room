@@ -8,164 +8,240 @@ namespace Heat
 	{
 		enum class State
 		{
-			ResHot,
-			ResCold,
-			ResColdStartPump,
-			ResHeating,
-			ResDumpingExtraHeat,
-			BoilerStart,
-			BoilerStartPump,
-			BoilerHeating,
-			BoilerStop
+			Start,
+			Noop,
+			BoilerSoftHeating,
+
+			BoilerHardHeating,
+
+			BoilerFurnaceRundown,
+			BoilerPumpRundown,
+
+			ResSoftOpenLine,
+			ResSoftHeating,
+
+			ResHardHeating,
+
+			ResFurnaceRundown,
+			ResPumpRundown,
+
+			None
 		} _state;
 
-		Timer _valveTimer, _pumpTimer, _boilerHeat;
+		struct  
+		{
+			Timer pump;
+			Timer boiler;
+			Timer valveTurn;
+		} _timers;
+
 		Mixer _mixer;
 		Circulation _circ;
 
-		void _furnaceStop(Gpio &gpio, const Config &cfg)
+		/*void _furnaceStop(Gpio &gpio, const Config &cfg)
 		{
 			log("Control: furnace stop");
 
 			gpio.furnaceOff();
 			_pumpTimer.setMinutes(cfg.furnacePumpRunoutMin);
 			_valveTimer.setMinutes(cfg.furnacePumpRunoutMin + 1);
+		}*/
+
+		void _enterState(Gpio &gpio, Config &cfg, State st)
+		{
+			switch (st)
+			{
+			case State::Start:
+			{
+				log("Control: start");
+
+				gpio.closeReservoirLineBegin();
+				gpio.electricHeaterOff();
+				gpio.dieselOff();
+				gpio.furnacePumpOff();
+				gpio.pumpValveClose();
+				gpio.boilerValveClose();
+				gpio.radiatorPumpOff();
+				gpio.circulationPumpOff();
+
+				_timers.valveTurn.setSeconds(cfg.valveTurnTimeSec);
+			} break;
+
+			case State::Noop:
+			{
+				log("Control: idle");
+
+				gpio.closeReservoirLineEnd();
+				gpio.pumpValveClose();
+			} break;
+
+			case State::BoilerSoftHeating:
+			{
+				log("Control: boiler soft heating");
+
+				gpio.pumpValveOpen();
+				gpio.boilerValveOpen();
+				gpio.furnacePumpOn();
+				gpio.electricHeaterOn();
+
+				_timers.boiler.setMinutes(cfg.delayBeforeBoilerHeatMin);
+			} break;
+
+			case State::BoilerHardHeating:
+			{
+				log("Control: boiler full heating");
+
+				gpio.dieselOn();
+			} break;
+
+			case State::BoilerFurnaceRundown:
+			{
+				log("Control: boiler hot, furnace stop");
+
+				gpio.dieselOff();
+				gpio.electricHeaterOff();
+
+				_timers.pump.setMinutes(cfg.furnacePumpRunoutMin);
+			} break;
+
+			case State::ResPumpRundown:
+			case State::BoilerPumpRundown:
+			{
+				log("Control: pump stop");
+
+				gpio.furnacePumpOff();
+				gpio.closeReservoirLineBegin();
+
+				_timers.valveTurn.setSeconds(cfg.valveTurnTimeSec);
+			} break;
+
+			case State::ResSoftOpenLine:
+			{
+				log("Control: radiators soft heat, opening line");
+
+				gpio.pumpValveOpen();
+				gpio.openReservoirLineBegin();
+
+				_timers.valveTurn.setSeconds(cfg.valveTurnTimeSec);
+			} break;
+
+			case State::ResSoftHeating:
+			{
+				log("Control: radiators soft heat");
+
+				gpio.openReservoirLineEnd();
+				gpio.furnacePumpOn();
+				gpio.electricHeaterOn();
+
+				_timers.valveTurn.setSeconds(cfg.valveTurnTimeSec);
+			} break;
+
+			case State::ResHardHeating:
+			{
+				log("Control: radiators full heat");
+
+				gpio.dieselOn();
+			} break;
+
+			case State::ResFurnaceRundown:
+			{
+				log("Control: reservoir hot, furnace rundown");
+
+				gpio.dieselOff();
+				gpio.electricHeaterOff();
+
+				_timers.pump.setMinutes(cfg.furnacePumpRunoutMin);
+			} break;
+
+			default: 
+			{
+				log("Unknown state");
+				throw std::runtime_error("unexpected state");
+			} break;
+			}
+
+			_state = st;
 		}
 
 		void _tick(Gpio &gpio, Config &cfg, Temperature &temp, UserParams &user)
 		{
 			switch (_state)
 			{
-			case State::BoilerStart:
+			case State::Start:
 			{
-				log("Control: boiler start");
-
-				gpio.boilerValveOpen();
-				gpio.furnaceValveOpen();
-
-				_state = State::BoilerStartPump;
+				if (_timers.valveTurn.expired())
+					_enterState(State::Noop);
 			} break;
 
-			case State::BoilerStartPump:
+			case State::Noop:
 			{
-				log("Control: boiler start pump");
+				if (gpio.boilerNeedsHeat())
+					_enterState(State::BoilerSoftHeating)
 
-				gpio.furnacePumpOn();
-
-				gpio.closeReservoirLine(cfg);
-
-				gpio.furnaceOn();
-
-				_state = State::BoilerHeating;
-
-				log("Control: to boiler heating");
+				else if (_mixer.roomsNeedHeat() && !temp.reservoirHot())
+					_enterState(State::ResSoftOpenLine);
 			} break;
 
-			case State::BoilerHeating:
+			case State::BoilerSoftHeating:
+			{
+				if (_timers.boiler.expired())
+					_enterState(State::BoilerHardHeating);
+
+				else if (_mixer.needsHeat())
+					_enterState(State::BoilerHardHeating);
+
+				else if (!gpio.boilerNeedsHeat())
+					_enterState(State::BoilerFurnaceRundown);
+
+			} break;
+
+			case State::BoilerHardHeating:
 			{
 				if (!gpio.boilerNeedsHeat())
-				{
-					log("Control: boiler hot");
-
-					_furnaceStop(gpio, cfg);
-					_state = State::BoilerStop;
-
-					log("Control: boiler heating complete");
-				}
+					_enterState(State::BoilerFurnaceRundown);
 			} break;
 
-			case State::BoilerStop:
+			case State::BoilerFurnaceRundown:
 			{
-				if (_pumpTimer.expired())
-					gpio.furnacePumpOff();
-
-				if (_valveTimer.expired())
-				{
-					gpio.furnaceValveClose();
-					gpio.boilerValveClose();
-
-					_state = State::ResHot;
-
-					log("Control: from boiler to reservoir hot state");
-				}
+				if (_timers.pump.expired())
+					_enterState(State::BoilerPumpRundown);
 			} break;
 
-			case State::ResHot:
+			case State::ResPumpRundown:
+			case State::BoilerPumpRundown:
+			{
+				if (_timers.valveTurn.expired())
+					_enterState(State::Noop);
+			} break;
+
+			case State::ResSoftOpenLine:
+			{
+				if (_timers.valveTurn.expired())
+					_enterState(State::ResSoftHeating);
+			} break;
+
+			case State::ResSoftHeating:
 			{
 				if (_mixer.needsHeat())
-				{
-					_state = State::ResCold;
-				}
+					_enterState(State::ResHardHeating);
+
 				else if (gpio.boilerNeedsHeat())
-				{
-					if (!_boilerHeat.isSet())
-					{
-						_boilerHeat.setMinutes(cfg.delayBeforeBoilerHeatMin);
-						log("Control: set boiler heating timeout");
-					}
-				
-					if (_boilerHeat.expired())
-						_state = State::BoilerStart;
-					
-				}
+					_enterState(State::ResHardHeating);
+
+				else if (temp.reservoirHot())
+					_enterState(State::ResFurnaceRundown);
 			} break;
 
-			case State::ResCold:
-			{
-				log("Control: reservoir heating ready");
-
-				gpio.furnaceValveOpen();
-				gpio.boilerValveOpen();
-
-				_state = State::ResColdStartPump;
-
-			} break;
-
-			case State::ResColdStartPump:
-			{
-				log("Control: reservoir heating start");
-
-				gpio.furnacePumpOn();
-
-				gpio.openReservoirLine(cfg);
-
-				gpio.boilerValveClose();
-
-				gpio.furnaceOn();
-
-				_state = State::ResHeating;
-			}
-
-			case State::ResHeating:
+			case State::ResHardHeating:
 			{
 				if (temp.reservoirHot())
-				{
-					log("Control: dump extra heat to reservoir");
-					_state = State::ResDumpingExtraHeat;
-
-					_furnaceStop(gpio, cfg);
-				}
+					_enterState(State::ResFurnaceRundown);
 			} break;
 
-			case State::ResDumpingExtraHeat:
+			case State::ResFurnaceRundown:
 			{
-				gpio.furnaceOff();
-
-				if (!temp.heatFlowsFromFurnaceToReservoir())
-				{
-					if (_pumpTimer.expired())
-						gpio.furnacePumpOff();
-				}
-
-				if (!gpio.isFurnacePumpOn() && _valveTimer.expired())
-				{
-					log("Control: reservoir hot");
-
-					gpio.furnaceValveClose();
-					gpio.closeReservoirLine(cfg);
-
-					_state = State::ResHot;
-				}
+				if (_timers.pump.expired())
+					_enterState(State::ResPumpRundown);
 			} break;
 
 			default:
@@ -179,16 +255,17 @@ namespace Heat
 		{
 			if (temp.furnaceHot())
 			{
-				gpio.furnaceOff();
-				throw std::runtime_error("Furnace too hot");
+				gpio.dieselOff();
+				gpio.electricHeaterOff();
+				throw std::runtime_error("Output is too hot");
 			}
 
-			if (gpio.isFurnaceOn() && !temp.circulationGood())
+			if (gpio.isDieselOn() && !temp.circulationGood())
 			{
 				constexpr int checksPerMinute = 24, secPerMinute = 60;
 				if (++_circulationChecksFailed >= (cfg.allowCirculationDiffSec * checksPerMinute) / secPerMinute)
 				{
-					gpio.furnaceOff();
+					gpio.dieselOff();
 					throw std::runtime_error("Circulation failure detected");
 				}
 				else
@@ -201,8 +278,9 @@ namespace Heat
 	public:
 
 		Control(Gpio &gpio, Config &cfg)
-			: _state(State::ResHot), _mixer(cfg, gpio), _circulationChecksFailed(0)
+			: _state(State::None), _mixer(cfg, gpio), _circulationChecksFailed(0)
 		{
+			_enterState(gpio, cfg, State::Start);
 		}
 
 		void tick(Gpio &gpio, Config &cfg, Temperature &temp, UserParams &user)

@@ -174,8 +174,7 @@ namespace Heat
 
 		bool circulationGood() const
 		{
-			return abs(_readings[FURNACE_TEMP_A] - _readings[FURNACE_TEMP_B]) <= _cfg.furnaceMaxOutDiff
-				&& abs(_readings[FURNACE_TEMP_A] - _readings[FURNACE_RETURN]) <= _cfg.furnaceMaxOutReturnDiff;
+			return abs(_readings[FURNACE_TEMP_A] - _readings[FURNACE_RETURN]) <= _cfg.furnaceMaxOutReturnDiff;
 		}
 
 		int mixCold() const

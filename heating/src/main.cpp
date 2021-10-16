@@ -91,7 +91,8 @@ int main(int argc, const char **argv)
 		{
 			log(std::string("*** ERROR: ") + e.what());
 
-			gpio.furnaceOff();
+			gpio.electricHeaterOff();
+			gpio.dieselOff();
 			gpio.furnaceValveOpen();
 			gpio.boilerValveOpen();
 			gpio.furnacePumpOn();

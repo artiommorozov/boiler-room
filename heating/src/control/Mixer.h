@@ -188,17 +188,17 @@ namespace Heat
 					_mixSettings = current;
 				}
 
-				if (_mixSettings.mixOut >= _mixInHotTemp)
+				_needsHeat = false;
+
+				if (!roomsNeedHeat())
+				{
+					_maxColdFlow(gpio);
+				}
+				else if (_mixSettings.mixOut >= _mixInHotTemp)
 				{
 					_needsHeat = true;
 					_maxHotFlow(gpio);
-					continue;
 				}
-
-				_needsHeat = false;
-
-				if (_mixSettings.mixOut <= _insideExpectedTemp)
-					_maxColdFlow(gpio);
 				else
 					_mixSetAndCheck(_mixSettings.mixOut, gpio);
 			}
@@ -277,6 +277,11 @@ namespace Heat
 				_quit = true;
 				_thread->join();
 			}
+		}
+
+		bool roomsNeedHeat()
+		{
+			return _mixSettings.mixOut > _insideExpectedTemp;
 		}
 
 		bool needsHeat() const

@@ -103,6 +103,7 @@ struct Config : public JsonConfig
 	std::string gpioBoilerValve;
 	std::string gpioCirculationPump;
 	std::string gpioRadiatorPump;
+	std::string gpioElectricHeater;
 
 	std::string gpioTempMotorSense;
 	std::string gpioBoilerSense;
@@ -192,6 +193,7 @@ struct Config : public JsonConfig
 		gpioBoilerValve = tree.get<std::string>("gpio.boilerValve");
 		gpioCirculationPump = tree.get<std::string>("gpio.circulationPump");
 		gpioRadiatorPump = tree.get<std::string>("gpio.radiatorPump");
+		gpioElectricHeater = tree.get<std::string>("gpio.electricHeater");
 
 		gpioTempMotorSense = tree.get<std::string>("gpio.tempMotorSense");
 		gpioBoilerSense = tree.get<std::string>("gpio.boilerSense");
