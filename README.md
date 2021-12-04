@@ -22,7 +22,7 @@ drawing of boiler room hardware with matching parts in config.json
 
 KiCad projects with 2 boards (same page) interfacing Olimex board to motors, valves and sensors.
 One (left) is logic-level only and serves connecting bunch of ds18b20/ds18s20 sensors via ds2482 bridge;
-it also contains 2 darlington arrays ULN2003 connecting 3.3V GPIO to 5V relays.
+it also contains 3 darlington arrays ULN2003 connecting 3.3V GPIO to 5V relays.
 The other (right) is relay and feedback board.
 
 On a20 micro board use gpio pc3 for boiler sense if you don't want external pullup, other pins
@@ -77,7 +77,7 @@ one might use kernel module.
 
 Проект в KiCad для плат, соединяющих плату Olimex с моторами, клапанами и сенсорами.
 Левая часть - плата логики, соединяет десяток ds18b20/ds18s20 через ds2482. Там же
-стоит 2 сборки Дарлингтона uln2003 для управления 5В реле от 3.3В GPIO.
+стоит 3 сборки Дарлингтона uln2003 для управления 5В реле от 3.3В GPIO.
 
 Правая часть - силовая - реле и обратная связь привода крана температуры.
 
