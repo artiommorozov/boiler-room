@@ -2,7 +2,7 @@ EESchema Schematic File Version 4
 LIBS:cpu-cache
 EELAYER 26 0
 EELAYER END
-$Descr A3 16535 11693
+$Descr A2 23386 16535
 encoding utf-8
 Sheet 1 1
 Title ""
@@ -26,13 +26,13 @@ F 3 "~" H 9400 3010 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Motor:Motor_AC Furnace_pump
+L Motor:Motor_AC EHeat+pump
 U 1 1 5B82EBB4
 P 9400 3900
-F 0 "Furnace_pump" H 9558 3896 50  0000 L CNN
-F 1 "UPS 60W 270mA" H 9558 3805 50  0000 L CNN
+F 0 "EHeat+pump" H 9558 3896 50  0000 L CNN
+F 1 "relays + UPS 60W 300mA" H 9558 3805 50  0000 L CNN
 F 2 "" H 9400 3810 50  0001 C CNN
-F 3 "~" H 9400 3810 50  0001 C CNN
+F 3 "300mA" H 9400 3810 50  0001 C CNN
 	1    9400 3900
 	1    0    0    -1  
 $EndComp
@@ -75,8 +75,6 @@ Wire Wire Line
 	9800 6100 9800 6200
 Wire Wire Line
 	9800 5350 9800 5250
-Wire Wire Line
-	9400 4200 10200 4200
 Wire Wire Line
 	9400 3400 10300 3400
 $Comp
@@ -130,12 +128,12 @@ Wire Wire Line
 $Comp
 L Device:Varistor RV_400V
 U 1 1 5B834190
-P 10200 4050
-F 0 "RV_400V" H 10303 4096 50  0000 L CNN
-F 1 "Varistor" H 10303 4005 50  0000 L CNN
-F 2 "" V 10130 4050 50  0001 C CNN
-F 3 "~" H 10200 4050 50  0001 C CNN
-	1    10200 4050
+P 10800 4050
+F 0 "RV_400V" H 10903 4096 50  0000 L CNN
+F 1 "Varistor" H 10903 4005 50  0000 L CNN
+F 2 "" V 10730 4050 50  0001 C CNN
+F 3 "~" H 10800 4050 50  0001 C CNN
+	1    10800 4050
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -169,35 +167,32 @@ Wire Wire Line
 	10300 2800 10850 2800
 Connection ~ 10300 2800
 Wire Wire Line
-	10200 3900 10200 3600
+	10800 3900 10800 3600
 $Comp
 L Device:C C?
 U 1 1 5B8369F4
-P 10700 3750
-F 0 "C?" H 10815 3796 50  0000 L CNN
-F 1 "9nF 1kV" H 10815 3705 50  0000 L CNN
-F 2 "" H 10738 3600 50  0001 C CNN
-F 3 "~" H 10700 3750 50  0001 C CNN
-	1    10700 3750
+P 11300 3750
+F 0 "C?" H 11415 3796 50  0000 L CNN
+F 1 "9nF 1kV" H 11415 3705 50  0000 L CNN
+F 2 "" H 11338 3600 50  0001 C CNN
+F 3 "~" H 11300 3750 50  0001 C CNN
+	1    11300 3750
 	1    0    0    -1  
 $EndComp
 $Comp
 L Device:R R?
 U 1 1 5B8369FB
-P 10700 4050
-F 0 "R?" H 10770 4096 50  0000 L CNN
-F 1 "150 2W" H 10770 4005 50  0000 L CNN
-F 2 "" V 10630 4050 50  0001 C CNN
-F 3 "~" H 10700 4050 50  0001 C CNN
-	1    10700 4050
+P 11300 4050
+F 0 "R?" H 11370 4096 50  0000 L CNN
+F 1 "150 2W" H 11370 4005 50  0000 L CNN
+F 2 "" V 11230 4050 50  0001 C CNN
+F 3 "~" H 11300 4050 50  0001 C CNN
+	1    11300 4050
 	1    0    0    -1  
 $EndComp
+Connection ~ 10800 3600
 Wire Wire Line
-	9400 3600 10200 3600
-Connection ~ 9400 3600
-Connection ~ 10200 3600
-Wire Wire Line
-	10200 3600 10700 3600
+	10800 3600 11300 3600
 $Comp
 L Motor:Motor_AC Circulation_pump
 U 1 1 5B837CA2
@@ -305,13 +300,7 @@ Connection ~ 10600 5950
 Wire Wire Line
 	11850 5100 11850 5950
 Wire Wire Line
-	10200 4200 10700 4200
-Wire Wire Line
 	11850 4200 11850 5100
-Connection ~ 10200 4200
-Connection ~ 10700 4200
-Wire Wire Line
-	10700 4200 11850 4200
 Connection ~ 11850 5100
 Wire Wire Line
 	10850 3400 11850 3400
@@ -326,18 +315,16 @@ Wire Wire Line
 Connection ~ 10850 2650
 Connection ~ 11850 3400
 $Comp
-L Motor:Motor_AC Furnace
+L Motor:Motor_AC Furnace+relay
 U 1 1 5B854E8D
 P 9400 1600
-F 0 "Furnace" H 9558 1596 50  0000 L CNN
+F 0 "Furnace+relay" H 9558 1596 50  0000 L CNN
 F 1 "250W 1.2A" H 9558 1505 50  0000 L CNN
 F 2 "" H 9400 1510 50  0001 C CNN
 F 3 "~" H 9400 1510 50  0001 C CNN
 	1    9400 1600
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9400 1900 10300 1900
 $Comp
 L Relay:DIPxx-1Axx-11x Furnace_relay
 U 1 1 5B854E95
@@ -349,10 +336,6 @@ F 3 "https://standexelectronics.com/wp-content/uploads/datasheet_reed_relay_DIP.
 	1    7850 1600
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9400 1400 9400 1300
-Wire Wire Line
-	9400 1300 8050 1300
 Wire Wire Line
 	8050 1900 9000 1900
 $Comp
@@ -379,14 +362,8 @@ F 3 "~" H 10300 1750 50  0001 C CNN
 	1    10300 1750
 	1    0    0    -1  
 $EndComp
-Connection ~ 10300 1900
-Wire Wire Line
-	10300 1900 10850 1900
-Wire Wire Line
-	9400 1300 10300 1300
 Wire Wire Line
 	10300 1300 10300 1600
-Connection ~ 9400 1300
 $Comp
 L Device:C C?
 U 1 1 5B854EB2
@@ -416,10 +393,7 @@ Connection ~ 9000 1900
 Wire Wire Line
 	9000 2650 9000 1900
 Wire Wire Line
-	10850 1900 11850 1900
-Wire Wire Line
 	11850 1900 11850 2650
-Connection ~ 10850 1900
 Connection ~ 11850 2650
 $Comp
 L Device:C C?
@@ -527,10 +501,10 @@ F 3 "https://standexelectronics.com/wp-content/uploads/datasheet_reed_relay_DIP.
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:L Furnace_valve
+L Device:L Pump_valve
 U 1 1 5B8948B0
 P 9800 4650
-F 0 "Furnace_valve" H 9853 4696 50  0000 L CNN
+F 0 "Pump_valve" H 9853 4696 50  0000 L CNN
 F 1 "80mA" H 9853 4605 50  0000 L CNN
 F 2 "" H 9800 4650 50  0001 C CNN
 F 3 "~" H 9800 4650 50  0001 C CNN
@@ -715,12 +689,12 @@ Wire Wire Line
 $Comp
 L Transistor_Array:ULN2003 U?
 U 1 1 5B918B26
-P 4150 8200
-F 0 "U?" H 4150 8867 50  0000 C CNN
-F 1 "ULN2003" H 4150 8776 50  0000 C CNN
-F 2 "" H 4200 7650 50  0001 L CNN
-F 3 "http://www.ti.com/lit/ds/symlink/uln2003a.pdf" H 4250 8000 50  0001 C CNN
-	1    4150 8200
+P 4150 9700
+F 0 "U?" H 4150 10367 50  0000 C CNN
+F 1 "ULN2003" H 4150 10276 50  0000 C CNN
+F 2 "" H 4200 9150 50  0001 L CNN
+F 3 "http://www.ti.com/lit/ds/symlink/uln2003a.pdf" H 4250 9500 50  0001 C CNN
+	1    4150 9700
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -768,12 +742,12 @@ $EndComp
 $Comp
 L power:GNDREF #PWR0105
 U 1 1 5B9818EF
-P 4150 8800
-F 0 "#PWR0105" H 4150 8550 50  0001 C CNN
-F 1 "GNDREF" H 4155 8627 50  0000 C CNN
-F 2 "" H 4150 8800 50  0001 C CNN
-F 3 "" H 4150 8800 50  0001 C CNN
-	1    4150 8800
+P 4150 10300
+F 0 "#PWR0105" H 4150 10050 50  0001 C CNN
+F 1 "GNDREF" H 4155 10127 50  0000 C CNN
+F 2 "" H 4150 10300 50  0001 C CNN
+F 3 "" H 4150 10300 50  0001 C CNN
+	1    4150 10300
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -810,7 +784,7 @@ F 3 "" H 4750 7800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4550 7800 4750 7800
+	4550 9300 4750 9300
 $Comp
 L Device:R R?
 U 1 1 5B9A4BD2
@@ -878,7 +852,7 @@ F 3 "~" H 4900 3250 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	5150 8000 4550 8000
+	5150 9500 4550 9500
 $Comp
 L Device:R R?
 U 1 1 5BA149EB
@@ -1229,14 +1203,7 @@ F 3 "~" H 2150 3300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2450 3600 2450 3500
-Wire Wire Line
-	2450 3600 2450 4400
-Wire Wire Line
-	2450 4400 4100 4400
-Wire Wire Line
 	4100 4400 4100 3950
-Connection ~ 2450 3600
 Connection ~ 4100 3950
 Wire Wire Line
 	4100 3950 4250 3950
@@ -1264,42 +1231,6 @@ Wire Wire Line
 	3400 3100 2450 3100
 Wire Wire Line
 	3400 3050 3850 3050
-Wire Wire Line
-	3750 8500 950  8500
-Wire Wire Line
-	950  8500 950  3000
-Wire Wire Line
-	950  3000 1950 3000
-Wire Wire Line
-	3750 8400 1050 8400
-Wire Wire Line
-	1050 8400 1050 3100
-Wire Wire Line
-	1050 3100 1950 3100
-Wire Wire Line
-	3750 8300 1150 8300
-Wire Wire Line
-	1150 8300 1150 3200
-Wire Wire Line
-	1150 3200 1950 3200
-Wire Wire Line
-	3750 8200 1250 8200
-Wire Wire Line
-	1250 8200 1250 3300
-Wire Wire Line
-	1250 3300 1950 3300
-Wire Wire Line
-	3750 8100 1350 8100
-Wire Wire Line
-	1350 8100 1350 3400
-Wire Wire Line
-	1350 3400 1950 3400
-Wire Wire Line
-	3750 8000 1450 8000
-Wire Wire Line
-	1450 8000 1450 3500
-Wire Wire Line
-	1450 3500 1950 3500
 $Comp
 L Connector_Generic:Conn_01x04 J?
 U 1 1 5BC3871A
@@ -1601,33 +1532,21 @@ Wire Wire Line
 Wire Wire Line
 	5700 3650 5700 4550
 Wire Wire Line
-	5150 4650 5150 8000
-Wire Wire Line
-	4550 8100 5250 8100
-Wire Wire Line
-	5250 8100 5250 6500
+	4550 9600 5250 9600
 Wire Wire Line
 	5250 6200 5250 4750
 Wire Wire Line
-	5350 6800 5350 8200
-Wire Wire Line
-	4550 8200 5350 8200
+	4550 9700 5350 9700
 Wire Wire Line
 	5350 6500 5350 4850
 Wire Wire Line
-	5450 7150 5450 8300
-Wire Wire Line
-	5450 8300 4550 8300
+	5450 9800 4550 9800
 Wire Wire Line
 	5450 6850 5450 4950
 Wire Wire Line
-	5550 7500 5550 8400
+	4550 9900 5550 9900
 Wire Wire Line
-	4550 8400 5550 8400
-Wire Wire Line
-	5650 7850 5650 8500
-Wire Wire Line
-	4550 8500 5650 8500
+	4550 10000 5650 10000
 Wire Wire Line
 	5550 7200 5550 5050
 Wire Wire Line
@@ -1636,7 +1555,6 @@ Wire Wire Line
 	4750 7800 4750 8800
 Wire Wire Line
 	4750 8800 5750 8800
-Connection ~ 4750 7800
 Wire Wire Line
 	4650 3150 5800 3150
 Wire Wire Line
@@ -1807,4 +1725,300 @@ Wire Wire Line
 	14000 8250 14750 8250
 Text Notes 15300 7200 0    50   ~ 0
 Motor on feedback
+Connection ~ 10850 1900
+Wire Wire Line
+	10850 1900 11850 1900
+Connection ~ 10300 1900
+Wire Wire Line
+	10300 1900 10850 1900
+Wire Wire Line
+	9400 1900 10300 1900
+Connection ~ 10800 4200
+Connection ~ 11300 4200
+Wire Wire Line
+	11300 4200 11850 4200
+Wire Wire Line
+	10800 4200 11300 4200
+Wire Wire Line
+	9400 4200 10800 4200
+Wire Wire Line
+	9400 3600 10800 3600
+Connection ~ 9400 3600
+Wire Wire Line
+	600  3000 1950 3000
+Wire Wire Line
+	600  10000 3750 10000
+Wire Wire Line
+	700  9900 3750 9900
+Wire Wire Line
+	800  9800 3750 9800
+Wire Wire Line
+	900  9700 3750 9700
+Wire Wire Line
+	1000 9600 3750 9600
+Wire Wire Line
+	1100 9500 3750 9500
+Wire Wire Line
+	700  3100 1950 3100
+Wire Wire Line
+	800  3200 1950 3200
+Wire Wire Line
+	900  3300 1950 3300
+Wire Wire Line
+	1000 3400 1950 3400
+Wire Wire Line
+	1100 3500 1950 3500
+Wire Wire Line
+	2450 3500 2800 3500
+Wire Wire Line
+	2800 3500 2800 4400
+Wire Wire Line
+	2800 4400 4100 4400
+Wire Wire Line
+	4750 9300 4750 8800
+Connection ~ 4750 8800
+Wire Wire Line
+	5150 4650 5150 9500
+Wire Wire Line
+	5250 6500 5250 9600
+Wire Wire Line
+	5350 6800 5350 9700
+Wire Wire Line
+	5450 7150 5450 9800
+Wire Wire Line
+	5550 7500 5550 9900
+Wire Wire Line
+	5650 7850 5650 10000
+Wire Wire Line
+	1100 3500 1100 9500
+Wire Wire Line
+	1000 3400 1000 9600
+Wire Wire Line
+	900  3300 900  9700
+Wire Wire Line
+	800  3200 800  9800
+Wire Wire Line
+	700  3100 700  9900
+Wire Wire Line
+	600  3000 600  10000
+$Comp
+L Transistor_Array:ULN2003 U?
+U 1 1 61F8F89E
+P 6100 10350
+F 0 "U?" H 6100 11017 50  0000 C CNN
+F 1 "ULN2003" H 6100 10926 50  0000 C CNN
+F 2 "" H 6150 9800 50  0001 L CNN
+F 3 "http://www.ti.com/lit/ds/symlink/uln2003a.pdf" H 6200 10150 50  0001 C CNN
+	1    6100 10350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDREF #PWR?
+U 1 1 61F8F8A5
+P 6100 10950
+F 0 "#PWR?" H 6100 10700 50  0001 C CNN
+F 1 "GNDREF" H 6105 10777 50  0000 C CNN
+F 2 "" H 6100 10950 50  0001 C CNN
+F 3 "" H 6100 10950 50  0001 C CNN
+	1    6100 10950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6500 9950 6700 9950
+Wire Wire Line
+	6500 10550 7500 10550
+Wire Wire Line
+	5750 8800 6700 8800
+Connection ~ 5750 8800
+Wire Wire Line
+	6700 8800 6700 9950
+Wire Wire Line
+	2450 3600 2450 4400
+Wire Wire Line
+	2450 4400 1400 4400
+Wire Wire Line
+	1400 4400 1400 10550
+Wire Wire Line
+	1400 10550 5700 10550
+Wire Wire Line
+	1300 10650 1300 3600
+Wire Wire Line
+	1300 3600 1950 3600
+Wire Wire Line
+	1300 10650 5700 10650
+$Comp
+L Device:R R?
+U 1 1 62068EA8
+P 7650 10550
+F 0 "R?" V 7443 10550 50  0000 C CNN
+F 1 "360" V 7534 10550 50  0000 C CNN
+F 2 "" V 7580 10550 50  0001 C CNN
+F 3 "~" H 7650 10550 50  0001 C CNN
+	1    7650 10550
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 620BE842
+P 8100 10650
+F 0 "R?" V 7893 10650 50  0000 C CNN
+F 1 "360" V 7984 10650 50  0000 C CNN
+F 2 "" V 8030 10650 50  0001 C CNN
+F 3 "~" H 8100 10650 50  0001 C CNN
+	1    8100 10650
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6500 10650 7950 10650
+$Comp
+L Relay:DIPxx-1Axx-11x Diesel_valve_relay
+U 1 1 62114907
+P 10250 10800
+F 0 "Diesel_valve_relay" H 10580 10846 50  0000 L CNN
+F 1 "К293КП11Б" H 10580 10755 50  0000 L CNN
+F 2 "Relay_THT:Relay_StandexMeder_DIP_LowProfile" H 10600 10750 50  0001 L CNN
+F 3 "https://standexelectronics.com/wp-content/uploads/datasheet_reed_relay_DIP.pdf" H 10250 10800 50  0001 C CNN
+	1    10250 10800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10450 11100 11400 11100
+Wire Wire Line
+	10050 11200 10050 11300
+Wire Wire Line
+	8950 10500 10050 10500
+Wire Wire Line
+	7200 11100 7200 9600
+Wire Wire Line
+	7200 11100 10050 11100
+Connection ~ 7200 9600
+Wire Wire Line
+	7800 10550 8950 10550
+Wire Wire Line
+	8950 10550 8950 10500
+$Comp
+L Relay:DIPxx-1Axx-11x Electric_heater
+U 1 1 6222382C
+P 10250 11800
+F 0 "Electric_heater" H 10580 11846 50  0000 L CNN
+F 1 "К293КП11Б" H 10580 11755 50  0000 L CNN
+F 2 "Relay_THT:Relay_StandexMeder_DIP_LowProfile" H 10600 11750 50  0001 L CNN
+F 3 "https://standexelectronics.com/wp-content/uploads/datasheet_reed_relay_DIP.pdf" H 10250 11800 50  0001 C CNN
+	1    10250 11800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11800 11500 10450 11500
+Wire Wire Line
+	10450 12100 11400 12100
+Wire Wire Line
+	7200 12100 10050 12100
+Text Notes 11400 11800 0    50   ~ 0
+Heater circuit, separate power line
+Wire Wire Line
+	7200 11100 7200 12100
+Connection ~ 7200 11100
+Wire Wire Line
+	8250 11500 8250 10650
+Wire Wire Line
+	8250 11500 10050 11500
+Wire Wire Line
+	10450 10500 11750 10500
+$Comp
+L Relay:DIPxx-1Axx-11x Diesel_safety_relay
+U 1 1 622ADADF
+P 14100 10500
+F 0 "Diesel_safety_relay" H 14430 10546 50  0000 L CNN
+F 1 "??" H 14430 10455 50  0000 L CNN
+F 2 "Relay_THT:Relay_StandexMeder_DIP_LowProfile" H 14450 10450 50  0001 L CNN
+F 3 "https://standexelectronics.com/wp-content/uploads/datasheet_reed_relay_DIP.pdf" H 14100 10500 50  0001 C CNN
+	1    14100 10500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11400 11100 11400 10300
+Wire Wire Line
+	11400 10300 9000 10300
+Wire Wire Line
+	9000 10300 9000 9700
+Connection ~ 9000 9700
+$Comp
+L Device:L Diesel_valve
+U 1 1 623390C4
+P 11950 10850
+F 0 "Diesel_valve" H 12003 10896 50  0000 L CNN
+F 1 "80mA" H 12003 10805 50  0000 L CNN
+F 2 "" H 11950 10850 50  0001 C CNN
+F 3 "~" H 11950 10850 50  0001 C CNN
+	1    11950 10850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11950 11300 11950 11000
+$Comp
+L Device:R R?
+U 1 1 623390CC
+P 12750 11050
+F 0 "R?" H 12820 11096 50  0000 L CNN
+F 1 "500k" H 12820 11005 50  0000 L CNN
+F 2 "" V 12680 11050 50  0001 C CNN
+F 3 "~" H 12750 11050 50  0001 C CNN
+	1    12750 11050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11950 10500 11950 10700
+Connection ~ 11950 10500
+Wire Wire Line
+	11950 10500 12750 10500
+Wire Wire Line
+	12750 10500 12750 10900
+Wire Wire Line
+	11950 11300 12750 11300
+Wire Wire Line
+	13250 9500 11850 9500
+Connection ~ 11850 9500
+Wire Wire Line
+	13250 9500 13250 11300
+Wire Wire Line
+	12750 11200 12750 11300
+Connection ~ 12750 11300
+Wire Wire Line
+	12750 11300 13250 11300
+Wire Wire Line
+	13900 10200 13900 9500
+Wire Wire Line
+	13900 9500 13250 9500
+Connection ~ 13250 9500
+Wire Wire Line
+	11750 10500 11750 11400
+Wire Wire Line
+	11750 11400 13900 11400
+Wire Wire Line
+	13900 11400 13900 10800
+Connection ~ 11750 10500
+Wire Wire Line
+	11750 10500 11950 10500
+Wire Wire Line
+	8050 1300 10300 1300
+Wire Wire Line
+	14300 10800 16750 10800
+Wire Wire Line
+	14300 10200 16600 10200
+Wire Wire Line
+	8050 1300 8050 1000
+Wire Wire Line
+	8050 1000 16750 1000
+Wire Wire Line
+	16750 1000 16750 10800
+Connection ~ 8050 1300
+Wire Wire Line
+	16600 1150 9400 1150
+Wire Wire Line
+	9400 1150 9400 1400
+Wire Wire Line
+	16600 1150 16600 10200
+Connection ~ 9400 1400
+Wire Wire Line
+	9400 1400 9400 1450
 $EndSCHEMATC
