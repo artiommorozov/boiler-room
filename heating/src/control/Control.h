@@ -19,6 +19,7 @@ namespace Heat
 
 			ResSoftOpenLine,
 			ResSoftHeating,
+			ResSoftToBoilerSoft,
 
 			ResHardHeating,
 
@@ -46,6 +47,11 @@ namespace Heat
 			_pumpTimer.setMinutes(cfg.furnacePumpRunoutMin);
 			_valveTimer.setMinutes(cfg.furnacePumpRunoutMin + 1);
 		}*/
+		
+		void _setPumpRunoutTimer(Gpio &gpio, Config &cfg)
+		{
+			_timers.pump.setMinutes(gpio.isDieselOn() ? cfg.hardPumpRunoutMin : cfg.softPumpRunoutMin);
+		}
 
 		void _enterState(Gpio &gpio, Config &cfg, State st)
 		{
@@ -63,6 +69,7 @@ namespace Heat
 				gpio.boilerValveClose();
 				gpio.radiatorPumpOff();
 				gpio.circulationPumpOff();
+				gpio.dieselValveClose();
 
 				_timers.valveTurn.setSeconds(cfg.valveTurnTimeSec);
 			} break;
@@ -73,11 +80,15 @@ namespace Heat
 
 				gpio.closeReservoirLineEnd();
 				gpio.pumpValveClose();
+				gpio.dieselValveClose();
+				gpio.boilerValveClose();
 			} break;
 
 			case State::BoilerSoftHeating:
 			{
 				log("Control: boiler soft heating");
+
+				gpio.closeReservoirLineEnd(); // when entering from res soft heat
 
 				gpio.pumpValveOpen();
 				gpio.boilerValveOpen();
@@ -98,10 +109,11 @@ namespace Heat
 			{
 				log("Control: boiler hot, furnace stop");
 
+				_setPumpRunoutTimer(gpio, cfg);
+
 				gpio.dieselOff();
 				gpio.electricHeaterOff();
 
-				_timers.pump.setMinutes(cfg.furnacePumpRunoutMin);
 			} break;
 
 			case State::ResPumpRundown:
@@ -147,10 +159,21 @@ namespace Heat
 			{
 				log("Control: reservoir hot, furnace rundown");
 
+				_setPumpRunoutTimer(gpio, cfg);
+
 				gpio.dieselOff();
 				gpio.electricHeaterOff();
 
-				_timers.pump.setMinutes(cfg.furnacePumpRunoutMin);
+			} break;
+
+			case State::ResSoftToBoilerSoft:
+			{
+				log("Control: switching to boiler soft heat");
+
+				gpio.boilerValveOpen();
+				gpio.closeReservoirLineBegin();
+
+				_timers.valveTurn.setSeconds(cfg.valveTurnTimeSec);
 			} break;
 
 			default: 
@@ -170,78 +193,84 @@ namespace Heat
 			case State::Start:
 			{
 				if (_timers.valveTurn.expired())
-					_enterState(State::Noop);
+					_enterState(gpio, cfg, State::Noop);
 			} break;
 
 			case State::Noop:
 			{
 				if (gpio.boilerNeedsHeat())
-					_enterState(State::BoilerSoftHeating)
+					_enterState(gpio, cfg, State::BoilerSoftHeating);
 
-				else if (_mixer.roomsNeedHeat() && !temp.reservoirHot())
-					_enterState(State::ResSoftOpenLine);
+				else if (_mixer.roomsNeedHeat() && temp.reservoirNeedsSoftHeat())
+					_enterState(gpio, cfg, State::ResSoftOpenLine);
 			} break;
 
 			case State::BoilerSoftHeating:
 			{
 				if (_timers.boiler.expired())
-					_enterState(State::BoilerHardHeating);
+					_enterState(gpio, cfg, State::BoilerHardHeating);
 
 				else if (_mixer.needsHeat())
-					_enterState(State::BoilerHardHeating);
+					_enterState(gpio, cfg, State::BoilerHardHeating);
 
 				else if (!gpio.boilerNeedsHeat())
-					_enterState(State::BoilerFurnaceRundown);
+					_enterState(gpio, cfg, State::BoilerFurnaceRundown);
 
 			} break;
 
 			case State::BoilerHardHeating:
 			{
 				if (!gpio.boilerNeedsHeat())
-					_enterState(State::BoilerFurnaceRundown);
+					_enterState(gpio, cfg, State::BoilerFurnaceRundown);
 			} break;
 
 			case State::BoilerFurnaceRundown:
 			{
 				if (_timers.pump.expired())
-					_enterState(State::BoilerPumpRundown);
+					_enterState(gpio, cfg, State::BoilerPumpRundown);
 			} break;
 
 			case State::ResPumpRundown:
 			case State::BoilerPumpRundown:
 			{
 				if (_timers.valveTurn.expired())
-					_enterState(State::Noop);
+					_enterState(gpio, cfg, State::Noop);
 			} break;
 
 			case State::ResSoftOpenLine:
 			{
 				if (_timers.valveTurn.expired())
-					_enterState(State::ResSoftHeating);
+					_enterState(gpio, cfg, State::ResSoftHeating);
 			} break;
 
 			case State::ResSoftHeating:
 			{
 				if (_mixer.needsHeat())
-					_enterState(State::ResHardHeating);
+					_enterState(gpio, cfg, State::ResHardHeating);
 
 				else if (gpio.boilerNeedsHeat())
-					_enterState(State::ResHardHeating);
+					_enterState(gpio, cfg, State::ResSoftToBoilerSoft);
 
-				else if (temp.reservoirHot())
-					_enterState(State::ResFurnaceRundown);
+				else if (temp.reservoirHotSoftMode())
+					_enterState(gpio, cfg, State::ResFurnaceRundown);
+			} break;
+
+			case State::ResSoftToBoilerSoft:
+			{
+				if (_timers.valveTurn.expired())
+					_enterState(gpio, cfg, State::BoilerSoftHeating);
 			} break;
 
 			case State::ResHardHeating:
 			{
-				if (temp.reservoirHot())
-					_enterState(State::ResFurnaceRundown);
+				if (temp.reservoirHotHardMode())
+					_enterState(gpio, cfg, State::ResFurnaceRundown);
 			} break;
 
 			case State::ResFurnaceRundown:
 			{
 				if (_timers.pump.expired())
-					_enterState(State::ResPumpRundown);
+					_enterState(gpio, cfg, State::ResPumpRundown);
 			} break;
 
 			default:
@@ -262,8 +291,7 @@ namespace Heat
 
 			if (gpio.isDieselOn() && !temp.circulationGood())
 			{
-				constexpr int checksPerMinute = 24, secPerMinute = 60;
-				if (++_circulationChecksFailed >= (cfg.allowCirculationDiffSec * checksPerMinute) / secPerMinute)
+				if (++_circulationChecksFailed >= cfg.allowCirculationDiffSec)
 				{
 					gpio.dieselOff();
 					throw std::runtime_error("Circulation failure detected");
@@ -288,8 +316,6 @@ namespace Heat
 			_safetyCheck(gpio, cfg, temp);
 
 			_tick(gpio, cfg, temp, user);
-
-			_safetyCheck(gpio, cfg, temp);
 
 			_circ.tick(gpio, cfg);
 

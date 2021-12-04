@@ -93,7 +93,7 @@ int main(int argc, const char **argv)
 
 			gpio.electricHeaterOff();
 			gpio.dieselOff();
-			gpio.furnaceValveOpen();
+			gpio.pumpValveOpen();
 			gpio.boilerValveOpen();
 			gpio.furnacePumpOn();
 			sleep(60);

@@ -97,9 +97,10 @@ struct Config : public JsonConfig
 	std::string gpioMotorTempDown;
 	std::string gpioMotorCloseBoiler;
 	std::string gpioMotorOpenBoiler;
-	std::string gpioFurnace;
-	std::string gpioFurnacePump;
-	std::string gpioFurnaceValve;
+	std::string gpioDiesel;
+	std::string gpioDieselValve;
+	std::string gpioHeatersPump;
+	std::string gpioPumpValve;
 	std::string gpioBoilerValve;
 	std::string gpioCirculationPump;
 	std::string gpioRadiatorPump;
@@ -122,12 +123,14 @@ struct Config : public JsonConfig
 	int furnaceMaxTemp;
 	int furnaceMaxOutDiff;
 	int furnaceMaxOutReturnDiff;
-	int reservoirLowMaxTemp;
+	int reservoirBottomMaxTempSoft;
+	int reservoirBottomMaxTempHard;
 
 	int valveTurnTimeSec;
 
 	int delayBeforeBoilerHeatMin;
-	int furnacePumpRunoutMin;
+	int hardPumpRunoutMin;
+	int softPumpRunoutMin;
 	int circulationPumpIdleMin;
 	int circulationPumpRunMin;
 	int allowCirculationDiffSec;
@@ -173,12 +176,14 @@ struct Config : public JsonConfig
 		furnaceMaxTemp = tree.get<int>("maxTemp.furnaceOut");
 		furnaceMaxOutDiff = tree.get<int>("maxTemp.furnaceOutDiff");
 		furnaceMaxOutReturnDiff = tree.get<int>("maxTemp.furnaceOutReturnDiff");
-		reservoirLowMaxTemp = tree.get<int>("maxTemp.reservoirBottom");
+		reservoirBottomMaxTempSoft = tree.get<int>("maxTemp.reservoirBottomSoft");
+		reservoirBottomMaxTempHard = tree.get<int>("maxTemp.reservoirBottomHard");
 
 		valveTurnTimeSec = tree.get<int>("valves.fullTurnSec");
 
 		delayBeforeBoilerHeatMin = tree.get<int>("delay.boilerHeatMin");
-		furnacePumpRunoutMin = tree.get<int>("delay.furnacePumpRunoutMin");
+		hardPumpRunoutMin = tree.get<int>("delay.hardPumpRunoutMin");
+		softPumpRunoutMin = tree.get<int>("delay.softPumpRunoutMin");
 		circulationPumpIdleMin = tree.get<int>("delay.circulationPumpIdleMin");
 		circulationPumpRunMin = tree.get<int>("delay.circulationPumpRunMin");
 		allowCirculationDiffSec = tree.get<int>("delay.allowCirculationDiffSec");
@@ -187,9 +192,10 @@ struct Config : public JsonConfig
 		gpioMotorTempDown = tree.get<std::string>("gpio.motorTempDown");
 		gpioMotorCloseBoiler = tree.get<std::string>("gpio.motorCloseBoiler");
 		gpioMotorOpenBoiler = tree.get<std::string>("gpio.motorOpenBoiler");
-		gpioFurnace = tree.get<std::string>("gpio.furnace");
-		gpioFurnacePump = tree.get<std::string>("gpio.furnacePump");
-		gpioFurnaceValve = tree.get<std::string>("gpio.furnaceValve");
+		gpioDiesel = tree.get<std::string>("gpio.diesel");
+		gpioDieselValve = tree.get<std::string>("gpio.dieselValve");
+		gpioHeatersPump = tree.get<std::string>("gpio.heatersPump");
+		gpioPumpValve = tree.get<std::string>("gpio.pumpValve");
 		gpioBoilerValve = tree.get<std::string>("gpio.boilerValve");
 		gpioCirculationPump = tree.get<std::string>("gpio.circulationPump");
 		gpioRadiatorPump = tree.get<std::string>("gpio.radiatorPump");

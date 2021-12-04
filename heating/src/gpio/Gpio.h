@@ -129,7 +129,7 @@ class Gpio : boost::noncopyable
 	}
 
 	std::unique_ptr< GpioOutPin > _motorTempUp, _motorTempDown, _motorCloseBoiler, _motorOpenBoiler, 
-		_furnace, _furnacePump, _pumpValve, _boilerValve, _circulationPump, _radiatorPump, _elHeater;
+		_diesel, _dieselValve, _furnacePump, _pumpValve, _boilerValve, _circulationPump, _radiatorPump, _elHeater;
 
 	std::unique_ptr< GpioInPin > _tempMotorSense, _boilerSense;
 
@@ -146,9 +146,10 @@ public:
 		_motorTempDown.reset(new GpioOutPin(cfg.gpioMotorTempDown));
 		_motorCloseBoiler.reset(new GpioOutPin(cfg.gpioMotorCloseBoiler));
 		_motorOpenBoiler.reset(new GpioOutPin(cfg.gpioMotorOpenBoiler));
-		_furnace.reset(new GpioOutPin(cfg.gpioFurnace));
-		_furnacePump.reset(new GpioOutPin(cfg.gpioFurnacePump));
-		_pumpValve.reset(new GpioOutPin(cfg.gpioFurnaceValve));
+		_diesel.reset(new GpioOutPin(cfg.gpioDiesel));
+		_dieselValve.reset(new GpioOutPin(cfg.gpioDieselValve));
+		_furnacePump.reset(new GpioOutPin(cfg.gpioHeatersPump));
+		_pumpValve.reset(new GpioOutPin(cfg.gpioPumpValve));
 		_boilerValve.reset(new GpioOutPin(cfg.gpioBoilerValve));
 		_circulationPump.reset(new GpioOutPin(cfg.gpioCirculationPump));
 		_radiatorPump.reset(new GpioOutPin(cfg.gpioRadiatorPump));
@@ -162,15 +163,17 @@ public:
 
 	void dieselOff()
 	{
-		if (_furnace->low())
+		if (_diesel->low())
 			log("diesel off");
 	}
 
 	void dieselOn()
 	{
-		_furnace->high();
+		dieselValveOpen();
 
-		log("furnace ON");
+		_diesel->high();
+
+		log("diesel ON");
 	}
 
 	void electricHeaterOff()
@@ -186,9 +189,21 @@ public:
 		log("electric heater ON");
 	}
 
+	void dieselValveClose()
+	{
+		if (_dieselValve->low())
+			log("diesel valve closed");
+	}
+
+	void dieselValveOpen()
+	{
+		_dieselValve->high();
+		log("diesel valve OPEN");
+	}
+
 	bool isDieselOn() const
 	{
-		return !_furnace->isLow();
+		return !_diesel->isLow();
 	}
 
 	void furnacePumpOn()
@@ -277,8 +292,11 @@ public:
 		_motorOpenBoiler->high();
 	}
 
-	void void closeReservoirLineEnd()
+	void closeReservoirLineEnd()
 	{
+		if (_resLineClosed)
+			return;
+
 		_motorOpenBoiler->low();
 
 		log("reservoir line CLOSED / boiler line OPENED");
@@ -300,6 +318,9 @@ public:
 
 	void openReservoirLineEnd()
 	{
+		if (!_resLineClosed)
+			return;
+
 		_motorCloseBoiler->low();
 
 		log("reservoir line OPENED / boiler line CLOSED");

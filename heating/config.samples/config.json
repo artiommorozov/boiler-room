@@ -5,20 +5,22 @@
   },
 
   "gpio": {
-    "export": [ 1, 2, 3, ... ],
+    "export": [ 68, 64, 48, 67, 66, 58, 51, 50, 1, 3, 4, 74, 65, 49 ],
 
-    "motorTempUp": "/sys/class/gpio/gpioN_pinX",
-    "motorTempDown": "motorTempDown",
-    "motorCloseBoiler": "motorCloseBoiler",
-    "motorOpenBoiler": "motorOpenBoiler",
-    "furnace": "furnace",
-    "furnacePump": "furnacePump",
-    "furnaceValve": "furnaceValve",
-    "boilerValve": "boilerValve",
-    "circulationPump": "circulationPump",
-    "radiatorPump": "radiatorPump",
-    "tempMotorSense": "tempMotorSense",
-    "boilerSense": "boilerSense"
+    "motorTempUp": "/sys/class/gpio/gpio58_pi10",
+    "motorTempDown": "/sys/class/gpio/gpio51_pi3",
+    "motorCloseBoiler": "/sys/class/gpio/gpio67_pe5",
+    "motorOpenBoiler": "/sys/class/gpio/gpio66_pe4",
+    "diesel": "/sys/class/gpio/gpio64_pe2",
+    "dieselValve": "/sys/class/gpio/gpio4_pg3",
+    "heatersPump": "/sys/class/gpio/gpio48_pi0",
+    "pumpValve": "/sys/class/gpio/gpio65_pe3",
+    "boilerValve": "/sys/class/gpio/gpio49_pi1",
+    "circulationPump": "/sys/class/gpio/gpio68_pe6",
+    "radiatorPump":  "/sys/class/gpio/gpio50_pi2",
+    "tempMotorSense": "/sys/class/gpio/gpio1_pg0",
+    "electricHeater": "/sys/class/gpio/gpio3_pg2",
+    "boilerSense": "/sys/class/gpio/gpio74_pc3"
   },
 
   "tempSensors": {
@@ -46,9 +48,10 @@
 
   "maxTemp": {
     "furnaceOut": 75,
-    "furnaceOutDiff": 2,
-    "furnaceOutReturnDiff": 17,
-    "reservoirBottom": 65
+    "furnaceOutDiff": 8,
+    "furnaceOutReturnDiff": 20,
+    "reservoirBottomHard": 60,
+    "reservoirBottomSoft": 58
   },
 
   "valves": {
@@ -56,10 +59,11 @@
   },
 
   "delay": {
-    "boilerHeatMin": 60,
-    "furnacePumpRunoutMin": 5,
+    "boilerHeatMin": 120,
+    "hardPumpRunoutMin": 5,
+    "softPumpRunoutMin": 1,
     "circulationPumpIdleMin": 120,
-    "circulationPumpRunMin": 1,
+    "circulationPumpRunMin": 2,
     "allowCirculationDiffSec": 90
   },
 
@@ -75,7 +79,7 @@
   "log": {
     "controlDir": "/logs/heating/control",
     "tempDir": "/logs/heating/temp",
-    "rotateCmd": "find /logs/heating -type f -ctime +5 | xargs /bin/rm -f"
+    "rotateCmd": "find -H /logs/heating -type f -ctime +5 | xargs /bin/rm -f "
   },
 
   "web": {

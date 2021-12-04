@@ -7,7 +7,7 @@ namespace Heat
 
 	class Temperature : boost::noncopyable
 	{
-		Config _cfg;
+		const Config &_cfg;
 
 		enum SensorId
 		{
@@ -162,19 +162,25 @@ namespace Heat
 				|| _readings[FURNACE_TEMP_B] > _cfg.furnaceMaxTemp;
 		}
 
-		bool heatFlowsFromFurnaceToReservoir() const
+		bool reservoirHotSoftMode() const
 		{
-			return _readings[RESERVOIR_LOW] < _readings[FURNACE_TEMP_A] && reservoirHot();
+			return _readings[RESERVOIR_LOW] >= _cfg.reservoirBottomMaxTempSoft;
 		}
 
-		bool reservoirHot() const
+		bool reservoirNeedsSoftHeat() const
 		{
-			return _readings[RESERVOIR_LOW] >= _cfg.reservoirLowMaxTemp;
+			const int sensorsErrMax = 2;
+			return _readings[RESERVOIR_LOW] <= _readings[MIX_RETURN] + sensorsErrMax;
+		}
+
+		bool reservoirHotHardMode() const
+		{
+			return _readings[RESERVOIR_LOW] >= _cfg.reservoirBottomMaxTempHard;
 		}
 
 		bool circulationGood() const
 		{
-			return abs(_readings[FURNACE_TEMP_A] - _readings[FURNACE_RETURN]) <= _cfg.furnaceMaxOutReturnDiff;
+			return abs(_readings[FURNACE_TEMP_B] - _readings[FURNACE_RETURN]) <= _cfg.furnaceMaxOutReturnDiff;
 		}
 
 		int mixCold() const
