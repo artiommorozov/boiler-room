@@ -91,9 +91,9 @@ namespace Heat
 				gpio.closeReservoirLineEnd(); // when entering from res soft heat
 
 				gpio.pumpValveOpen();
-				gpio.boilerValveOpen();
 				gpio.furnacePumpOn();
 				gpio.electricHeaterOn();
+				gpio.boilerValveOpen();
 
 				_timers.boiler.setMinutes(cfg.delayBeforeBoilerHeatMin);
 			} break;
@@ -201,8 +201,9 @@ namespace Heat
 				if (gpio.boilerNeedsHeat())
 					_enterState(gpio, cfg, State::BoilerSoftHeating);
 
-				else if (_mixer.roomsNeedHeat() && temp.reservoirNeedsSoftHeat())
+				else if (_mixer.needsHeat() || (_mixer.roomsNeedHeat() && temp.reservoirNeedsSoftHeat()))
 					_enterState(gpio, cfg, State::ResSoftOpenLine);
+
 			} break;
 
 			case State::BoilerSoftHeating:
