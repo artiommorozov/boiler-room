@@ -90,10 +90,10 @@ namespace Heat
 
 				gpio.closeReservoirLineEnd(); // when entering from res soft heat
 
+				gpio.boilerValveOpen();
 				gpio.pumpValveOpen();
 				gpio.furnacePumpOn();
 				gpio.electricHeaterOn();
-				gpio.boilerValveOpen();
 
 				_timers.boiler.setMinutes(cfg.delayBeforeBoilerHeatMin);
 			} break;
