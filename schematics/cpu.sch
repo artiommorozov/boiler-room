@@ -78,17 +78,6 @@ Wire Wire Line
 Wire Wire Line
 	9400 3400 10300 3400
 $Comp
-L Relay:DIPxx-1Axx-11x Radiator_relay
-U 1 1 5B832597
-P 7850 3100
-F 0 "Radiator_relay" H 8180 3146 50  0000 L CNN
-F 1 "К293КП11Б" H 8180 3055 50  0000 L CNN
-F 2 "Relay_THT:Relay_StandexMeder_DIP_LowProfile" H 8200 3050 50  0001 L CNN
-F 3 "https://standexelectronics.com/wp-content/uploads/datasheet_reed_relay_DIP.pdf" H 7850 3100 50  0001 C CNN
-	1    7850 3100
-	1    0    0    -1  
-$EndComp
-$Comp
 L Relay:DIPxx-1Axx-11x Furnace_relay
 U 1 1 5B8325EF
 P 7850 3900
@@ -831,17 +820,6 @@ F 3 "~" H 5550 7350 50  0001 C CNN
 $EndComp
 $Comp
 L Device:R R?
-U 1 1 5B9D0D76
-P 5650 7700
-F 0 "R?" V 5443 7700 50  0000 C CNN
-F 1 "360" V 5534 7700 50  0000 C CNN
-F 2 "" V 5580 7700 50  0001 C CNN
-F 3 "~" H 5650 7700 50  0001 C CNN
-	1    5650 7700
-	-1   0    0    1   
-$EndComp
-$Comp
-L Device:R R?
 U 1 1 5B9DD26A
 P 4900 3250
 F 0 "R?" V 4693 3250 50  0000 C CNN
@@ -1550,8 +1528,6 @@ Wire Wire Line
 Wire Wire Line
 	5550 7200 5550 5050
 Wire Wire Line
-	5650 7550 5650 5150
-Wire Wire Line
 	4750 7800 4750 8800
 Wire Wire Line
 	4750 8800 5750 8800
@@ -1788,8 +1764,6 @@ Wire Wire Line
 Wire Wire Line
 	5550 7500 5550 9900
 Wire Wire Line
-	5650 7850 5650 10000
-Wire Wire Line
 	1100 3500 1100 9500
 Wire Wire Line
 	1000 3400 1000 9600
@@ -2021,4 +1995,17 @@ Wire Wire Line
 Connection ~ 9400 1400
 Wire Wire Line
 	9400 1400 9400 1450
+$Comp
+L Relay:DIPxx-1Axx-11x Radiator_pump_relay
+U 1 1 68CF24BE
+P 7850 3100
+F 0 "Radiator_pump_relay" H 8180 3146 50  0000 L CNN
+F 1 "RE030005 " H 8180 3055 50  0000 L CNN
+F 2 "Relay_THT:Relay_StandexMeder_DIP_LowProfile" H 8200 3050 50  0001 L CNN
+F 3 "https://standexelectronics.com/wp-content/uploads/datasheet_reed_relay_DIP.pdf" H 7850 3100 50  0001 C CNN
+	1    7850 3100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5650 5150 5650 10000
 $EndSCHEMATC
